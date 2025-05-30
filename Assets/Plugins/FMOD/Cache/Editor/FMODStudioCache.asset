@@ -15,10 +15,10 @@ MonoBehaviour:
   Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638797434424452012
+  lastModified: 638842240508936174
   FileSizes:
   - Name: Desktop
-    Value: 903072
+    Value: 903168
   Exists: 1
 --- !u!114 &-1836387868118401317
 MonoBehaviour:
@@ -35,10 +35,10 @@ MonoBehaviour:
   Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638797434424472058
+  lastModified: 638842240508981289
   FileSizes:
   - Name: Desktop
-    Value: 840
+    Value: 978
   Exists: 1
 --- !u!114 &-305072732620892430
 MonoBehaviour:
@@ -90,7 +90,7 @@ MonoBehaviour:
   - {fileID: -3619540712590368725}
   StringsBanks:
   - {fileID: -1836387868118401317}
-  cacheTime: 638797434424472058
+  cacheTime: 638842240508981289
   cacheVersion: 131624
 --- !u!114 &1600647092938487003
 MonoBehaviour:

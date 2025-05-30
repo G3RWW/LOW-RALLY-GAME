@@ -124,9 +124,9 @@ public class CarController : MonoBehaviour
         }
 
         // ✅ Generate unique log filename with local timestamp
-        string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        logFilePath = Path.Combine(Application.persistentDataPath, $"CarDebugLog_{timestamp}.txt");
-        logData.AppendLine($"=== Car Debug Log Started at {System.DateTime.Now} ===\n");
+        //string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        //logFilePath = Path.Combine(Application.persistentDataPath, $"CarDebugLog_{timestamp}.txt");
+        //logData.AppendLine($"=== Car Debug Log Started at {System.DateTime.Now} ===\n");
 
         ApplyWheelSettings();
 
@@ -184,14 +184,15 @@ public class CarController : MonoBehaviour
         // Check for skidding and apply skids
         HandleSkidMarks();
         // HandleSkidParticles(); // Handle skid particles
-        HandleDirtParticles(); 
+        HandleDirtParticles();
         HandleSmoketParticles(); // Handle smoke particles
-
+        
+        /*
         DebugGripChanges(); // 👈 Call it here
-
         // Detect anomalies in physics
         DetectWheelColliderAnomalies();
         DetectCarJumping();
+        */
 
     }
     void Update()
@@ -1150,7 +1151,7 @@ public class CarController : MonoBehaviour
         }
     }
 //=============================================================================================
-    void OnApplicationQuit()
+    /*void OnApplicationQuit()
     {
         // ✅ Append log data instead of overwriting
         File.AppendAllText(logFilePath, logData.ToString());
@@ -1230,4 +1231,5 @@ public class CarController : MonoBehaviour
             }
         }
     }
+    */
 }
