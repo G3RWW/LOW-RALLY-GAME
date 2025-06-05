@@ -95,11 +95,6 @@ public class CarController : MonoBehaviour
     private StringBuilder logData = new StringBuilder(); // Stores logs in memory
     private string logFilePath;
     // Debugging wheel collider anomalies
-    private Vector3 lastCarPosition;
-    private float lastCarYVelocity;
-    private float[] lastSuspensionDistances = new float[4];
-    private float suspensionThreshold = 0.05f; // Threshold for sudden wheel movement
-    private float jumpThreshold = 3f; // Threshold for unexpected vertical movement
     private string lastKnownAreaType = "";
 
     [Header("Debug Toggles")]

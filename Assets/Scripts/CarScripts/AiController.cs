@@ -28,7 +28,6 @@ public class AICarController : MonoBehaviour
     public WayPointContainerScript wayPointContainer;
     public List<Transform> waypoints = new List<Transform>();
     private int currentWaypointIndex = 0;
-    private bool firstLap = true;
     public float waypointRange = 0.5f; // AI must be within 0.5m of the waypoint before switching
     private HashSet<Transform> visitedWaypoints = new HashSet<Transform>();
 
@@ -67,7 +66,6 @@ public class AICarController : MonoBehaviour
     public AIBehaviorType aiBehavior = AIBehaviorType.Careful;
     public float overtakeBoost = 1.3f; // How much faster the car tries to go during overtake
     public float sideOffset = 2f;      // How far it tries to move left/right to overtake
-    private bool isOvertaking = false;
 
     [Header("Joker Lap Settings")]
     public Transform jokerLapExitPoint; // Exit point for the Joker Lap
@@ -93,7 +91,6 @@ public class AICarController : MonoBehaviour
     [Header("Debugging")]
     private int lapCount = 0;
     private float lapTimer = 0f;
-    private int timesOffTrack = 0;
 
     [Header("Recovery Mode")]
     private bool isInRecoveryMode = false;
@@ -548,7 +545,6 @@ public class AICarController : MonoBehaviour
         {
             currentWaypointIndex = 1; // Skip index 0 to avoid instant lap spam
             lapCount++;
-            firstLap = false;
 
             Debug.Log($"🏁 {name} finished lap {lapCount}");
 
@@ -784,7 +780,6 @@ public class AICarController : MonoBehaviour
         if (other.transform == jokerLapExitPoint && !hasTakenJokerLap)
         {
             lapCount++;
-            firstLap = false;
 
             Debug.Log($"🏁 Joker Lap completed at exit! Lap {lapCount} counted.");
             return;

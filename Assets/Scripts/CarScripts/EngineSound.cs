@@ -10,16 +10,10 @@ public class EngineSoundFMOD : MonoBehaviour
     public float minRPM = 800f;
     public float maxRPM = 7000f;
 
-    public float engineVolume = 1f; // 🎚️ Inspector slider 
-    [Range(0f, 1f)]
-
-    private Bus engineBus; // 🎚️ Inspector slider
+    private Bus engineBus;
 
     [Header("Car Reference")]
     public CarController car;
-
-    [Header("Manual Volume Control")]
-    [Range(0f, 1f)] public float volume = 1f; // 🎚️ Inspector slider
 
     private EventInstance engineInstance;
     private bool instanceIsValid = false;
@@ -31,7 +25,7 @@ public class EngineSoundFMOD : MonoBehaviour
             car = GetComponent<CarController>();
         }
 
-        engineBus = RuntimeManager.GetBus("bus:/Engine"); // 🎚️ Inspector slider
+        engineBus = RuntimeManager.GetBus("bus:/Engine");
     }
 
     void Start()
@@ -56,9 +50,11 @@ public class EngineSoundFMOD : MonoBehaviour
         float clampedRPM = Mathf.Clamp(car.currentRPM, minRPM, maxRPM);
         engineInstance.setParameterByName("RPM", clampedRPM);
 
-        float finalVolume = volume * UISettingsManager.Instance.engineVolume;
-        engineInstance.setVolume(finalVolume);
-
+        // 🔊 Set volume from global audio manager
+        if (FMODAudioManager.Instance != null)
+        {
+            engineInstance.setVolume(FMODAudioManager.Instance.engineVolume);
+        }
     }
 
     void OnDestroy()

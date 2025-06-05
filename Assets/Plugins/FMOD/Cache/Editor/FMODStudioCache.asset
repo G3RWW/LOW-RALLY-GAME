@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: 'event:/The Product - Light It Up [HD]'
   Guid:
-    Data1: -1097143306
-    Data2: 1165318158
-    Data3: 1388485804
-    Data4: 832267488
+    Data1: 407576045
+    Data2: 1274425583
+    Data3: 1773421715
+    Data4: -864095535
   Banks:
-  - {fileID: 3520233502665537251}
+  - {fileID: -2693592098350165828}
   IsStream: 1
   Is3D: 0
-  IsOneShot: 0
+  IsOneShot: 1
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 173326
+  Length: 176901
 --- !u!114 &-6992636731516093540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41,19 +41,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: 'event:/Without Tomorrow - Break Free [HD]'
   Guid:
-    Data1: 1872430463
-    Data2: 1270716330
-    Data3: -206019406
-    Data4: -733692473
+    Data1: -1160780919
+    Data2: 1144163625
+    Data3: 863545248
+    Data4: 107303725
   Banks:
-  - {fileID: 3520233502665537251}
+  - {fileID: -2693592098350165828}
   IsStream: 1
   Is3D: 0
-  IsOneShot: 0
+  IsOneShot: 1
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 192000
+  Length: 194115
+--- !u!114 &-6111932089527203584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/86_BOXER_ENGINE/RPM
+  m_EditorClassIdentifier: 
+  Name: RPM
+  StudioPath: 
+  Min: 0
+  Max: 7000
+  Default: 0
+  ID:
+    data1: 3265852736
+    data2: 4143004016
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &-5686995003472779989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,7 +145,7 @@ MonoBehaviour:
   - Name: Desktop
     Value: 1452
   Exists: 1
---- !u!114 &-3230318196932290675
+--- !u!114 &-2693592098350165828
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,15 +155,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
+  m_Name: bank:/Music.bank
   m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 638842324889176830
+  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Music.bank
+  Name: Music
+  StudioPath: bank:/Music
+  lastModified: 638847351962749493
   FileSizes:
   - Name: Desktop
-    Value: 1452
+    Value: 7465856
   Exists: 1
 --- !u!114 &-2530473241428963955
 MonoBehaviour:
@@ -161,26 +185,6 @@ MonoBehaviour:
   - Name: Desktop
     Value: 902240
   Exists: 1
---- !u!114 &-1881202295550530424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.strings.bank
-  m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/Master.strings.bank
-  Name: Master.strings
-  StudioPath: bank:/Master.strings
-  lastModified: 638842324889196879
-  FileSizes:
-  - Name: Desktop
-    Value: 1286
-  Exists: 1
 --- !u!114 &-1836387868118401317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +205,7 @@ MonoBehaviour:
   - Name: Desktop
     Value: 1286
   Exists: 1
---- !u!114 &-1284282583989471903
+--- !u!114 &-1384444972852888747
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -210,20 +214,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/86_BOXER_ENGINE/RPM
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Engine.bank
   m_EditorClassIdentifier: 
-  Name: RPM
-  StudioPath: 
-  Min: 0
-  Max: 7000
-  Default: 0
-  ID:
-    data1: 4286814655
-    data2: 1324165590
-  Type: 0
-  IsGlobal: 0
-  Labels: []
+  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Engine.bank
+  Name: Engine
+  StudioPath: bank:/Engine
+  lastModified: 638847349845846442
+  FileSizes:
+  - Name: Desktop
+    Value: 902240
+  Exists: 1
+--- !u!114 &-695068455759427404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 638847349842257205
+  FileSizes:
+  - Name: Desktop
+    Value: 1180
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -238,21 +258,21 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: -1881202295550530424}
-  - {fileID: 3520233502665537251}
-  - {fileID: -3230318196932290675}
-  - {fileID: 2061695518484743490}
+  - {fileID: -695068455759427404}
+  - {fileID: 7222253340187677654}
+  - {fileID: -2693592098350165828}
+  - {fileID: -1384444972852888747}
   EditorEvents:
   - {fileID: -6992636731516093540}
   - {fileID: 6449231721841021490}
   - {fileID: -9073569490565113304}
-  - {fileID: 7933244575112340931}
+  - {fileID: 6065389681282786403}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -3230318196932290675}
+  - {fileID: 7222253340187677654}
   StringsBanks:
-  - {fileID: -1881202295550530424}
-  cacheTime: 638842324890034036
+  - {fileID: -695068455759427404}
+  cacheTime: 638847351962749493
   cacheVersion: 131624
 --- !u!114 &889991593548354274
 MonoBehaviour:
@@ -281,46 +301,6 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 192000
---- !u!114 &2061695518484743490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/MUSIC.bank
-  m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/MUSIC.bank
-  Name: MUSIC
-  StudioPath: bank:/MUSIC
-  lastModified: 638842324890034036
-  FileSizes:
-  - Name: Desktop
-    Value: 902240
-  Exists: 1
---- !u!114 &3520233502665537251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/CAR SOUNDS.bank
-  m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/CAR SOUNDS.bank
-  Name: CAR SOUNDS
-  StudioPath: bank:/CAR SOUNDS
-  lastModified: 638842324889738272
-  FileSizes:
-  - Name: Desktop
-    Value: 7465792
-  Exists: 1
 --- !u!114 &5939768220175620792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -349,6 +329,34 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &6065389681282786403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/86_BOXER_ENGINE
+  m_EditorClassIdentifier: 
+  Path: event:/86_BOXER_ENGINE
+  Guid:
+    Data1: -1488537022
+    Data2: 1133931616
+    Data3: -2016605557
+    Data4: 971120645
+  Banks:
+  - {fileID: -1384444972852888747}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -6111932089527203584}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &6449231721841021490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,19 +371,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: event:/Mindslip - Broken Picture Frames
   Guid:
-    Data1: 196123530
-    Data2: 1200048104
-    Data3: 2048336308
-    Data4: 562567413
+    Data1: 1964158175
+    Data2: 1099616816
+    Data3: -1615749458
+    Data4: 674156514
   Banks:
-  - {fileID: 3520233502665537251}
+  - {fileID: -2693592098350165828}
   IsStream: 1
   Is3D: 0
-  IsOneShot: 0
+  IsOneShot: 1
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 187600
+  Length: 192208
 --- !u!114 &6516031744630792869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,7 +411,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 187600
---- !u!114 &7933244575112340931
+--- !u!114 &7222253340187677654
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -412,25 +420,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/86_BOXER_ENGINE
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
   m_EditorClassIdentifier: 
-  Path: event:/86_BOXER_ENGINE
-  Guid:
-    Data1: 1050849167
-    Data2: 1115018066
-    Data3: 229033387
-    Data4: 380617965
-  Banks:
-  - {fileID: 2061695518484743490}
-  IsStream: 0
-  Is3D: 0
-  IsOneShot: 0
-  Parameters:
-  - {fileID: -1284282583989471903}
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 0
+  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638847349842242164
+  FileSizes:
+  - Name: Desktop
+    Value: 1340
+  Exists: 1
 --- !u!114 &8811783834283822968
 MonoBehaviour:
   m_ObjectHideFlags: 0
