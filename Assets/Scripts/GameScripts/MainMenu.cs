@@ -62,5 +62,6 @@ public class MenuManager : MonoBehaviour
         selectMode.SetActive(false);
         selectCar.SetActive(false);
         selectMap.SetActive(false);
+        settingsMenu.SetActive(false);
     }
 }

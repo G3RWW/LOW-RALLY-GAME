@@ -1,5 +1,106 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9073569490565113304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 'event:/The Product - Light It Up [HD]'
+  m_EditorClassIdentifier: 
+  Path: 'event:/The Product - Light It Up [HD]'
+  Guid:
+    Data1: -1097143306
+    Data2: 1165318158
+    Data3: 1388485804
+    Data4: 832267488
+  Banks:
+  - {fileID: 3520233502665537251}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 173326
+--- !u!114 &-6992636731516093540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 'event:/Without Tomorrow - Break Free [HD]'
+  m_EditorClassIdentifier: 
+  Path: 'event:/Without Tomorrow - Break Free [HD]'
+  Guid:
+    Data1: 1872430463
+    Data2: 1270716330
+    Data3: -206019406
+    Data4: -733692473
+  Banks:
+  - {fileID: 3520233502665537251}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 192000
+--- !u!114 &-5686995003472779989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 'event:/The Product - Light It Up [HD]'
+  m_EditorClassIdentifier: 
+  Path: 'event:/The Product - Light It Up [HD]'
+  Guid:
+    Data1: -1097143306
+    Data2: 1165318158
+    Data3: 1388485804
+    Data4: 832267488
+  Banks:
+  - {fileID: -4457853814628020608}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 173326
+--- !u!114 &-4457853814628020608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/CAR SOUNDS.bank
+  m_EditorClassIdentifier: 
+  Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/CAR SOUNDS.bank
+  Name: CAR SOUNDS
+  StudioPath: bank:/CAR SOUNDS
+  lastModified: 638842324889738272
+  FileSizes:
+  - Name: Desktop
+    Value: 7465792
+  Exists: 1
 --- !u!114 &-3619540712590368725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,10 +116,70 @@ MonoBehaviour:
   Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638842240508936174
+  lastModified: 638842324889176830
   FileSizes:
   - Name: Desktop
-    Value: 903168
+    Value: 1452
+  Exists: 1
+--- !u!114 &-3230318196932290675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638842324889176830
+  FileSizes:
+  - Name: Desktop
+    Value: 1452
+  Exists: 1
+--- !u!114 &-2530473241428963955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/MUSIC.bank
+  m_EditorClassIdentifier: 
+  Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/MUSIC.bank
+  Name: MUSIC
+  StudioPath: bank:/MUSIC
+  lastModified: 638842324890034036
+  FileSizes:
+  - Name: Desktop
+    Value: 902240
+  Exists: 1
+--- !u!114 &-1881202295550530424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 638842324889196879
+  FileSizes:
+  - Name: Desktop
+    Value: 1286
   Exists: 1
 --- !u!114 &-1836387868118401317
 MonoBehaviour:
@@ -35,12 +196,12 @@ MonoBehaviour:
   Path: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638842240508981289
+  lastModified: 638842324889196879
   FileSizes:
   - Name: Desktop
-    Value: 978
+    Value: 1286
   Exists: 1
---- !u!114 &-305072732620892430
+--- !u!114 &-1284282583989471903
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -49,25 +210,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/CarEngine
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/86_BOXER_ENGINE/RPM
   m_EditorClassIdentifier: 
-  Path: event:/CarEngine
-  Guid:
-    Data1: 1050849167
-    Data2: 1115018066
-    Data3: 229033387
-    Data4: 380617965
-  Banks:
-  - {fileID: -3619540712590368725}
-  IsStream: 0
-  Is3D: 0
-  IsOneShot: 0
-  Parameters:
-  - {fileID: 1600647092938487003}
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 0
+  Name: RPM
+  StudioPath: 
+  Min: 0
+  Max: 7000
+  Default: 0
+  ID:
+    data1: 4286814655
+    data2: 1324165590
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,18 +238,200 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: -1836387868118401317}
-  - {fileID: -3619540712590368725}
+  - {fileID: -1881202295550530424}
+  - {fileID: 3520233502665537251}
+  - {fileID: -3230318196932290675}
+  - {fileID: 2061695518484743490}
   EditorEvents:
-  - {fileID: -305072732620892430}
+  - {fileID: -6992636731516093540}
+  - {fileID: 6449231721841021490}
+  - {fileID: -9073569490565113304}
+  - {fileID: 7933244575112340931}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -3619540712590368725}
+  - {fileID: -3230318196932290675}
   StringsBanks:
-  - {fileID: -1836387868118401317}
-  cacheTime: 638842240508981289
+  - {fileID: -1881202295550530424}
+  cacheTime: 638842324890034036
   cacheVersion: 131624
---- !u!114 &1600647092938487003
+--- !u!114 &889991593548354274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 'event:/Without Tomorrow - Break Free [HD]'
+  m_EditorClassIdentifier: 
+  Path: 'event:/Without Tomorrow - Break Free [HD]'
+  Guid:
+    Data1: 1872430463
+    Data2: 1270716330
+    Data3: -206019406
+    Data4: -733692473
+  Banks:
+  - {fileID: -4457853814628020608}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 192000
+--- !u!114 &2061695518484743490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/MUSIC.bank
+  m_EditorClassIdentifier: 
+  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/MUSIC.bank
+  Name: MUSIC
+  StudioPath: bank:/MUSIC
+  lastModified: 638842324890034036
+  FileSizes:
+  - Name: Desktop
+    Value: 902240
+  Exists: 1
+--- !u!114 &3520233502665537251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/CAR SOUNDS.bank
+  m_EditorClassIdentifier: 
+  Path: ../../AUDIO-FILES/fuckmode/86/Build/Desktop/CAR SOUNDS.bank
+  Name: CAR SOUNDS
+  StudioPath: bank:/CAR SOUNDS
+  lastModified: 638842324889738272
+  FileSizes:
+  - Name: Desktop
+    Value: 7465792
+  Exists: 1
+--- !u!114 &5939768220175620792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/86_BOXER_ENGINE
+  m_EditorClassIdentifier: 
+  Path: event:/86_BOXER_ENGINE
+  Guid:
+    Data1: 1050849167
+    Data2: 1115018066
+    Data3: 229033387
+    Data4: 380617965
+  Banks:
+  - {fileID: -2530473241428963955}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 8811783834283822968}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &6449231721841021490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Mindslip - Broken Picture Frames
+  m_EditorClassIdentifier: 
+  Path: event:/Mindslip - Broken Picture Frames
+  Guid:
+    Data1: 196123530
+    Data2: 1200048104
+    Data3: 2048336308
+    Data4: 562567413
+  Banks:
+  - {fileID: 3520233502665537251}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 187600
+--- !u!114 &6516031744630792869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Mindslip - Broken Picture Frames
+  m_EditorClassIdentifier: 
+  Path: event:/Mindslip - Broken Picture Frames
+  Guid:
+    Data1: 196123530
+    Data2: 1200048104
+    Data3: 2048336308
+    Data4: 562567413
+  Banks:
+  - {fileID: -4457853814628020608}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 187600
+--- !u!114 &7933244575112340931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/86_BOXER_ENGINE
+  m_EditorClassIdentifier: 
+  Path: event:/86_BOXER_ENGINE
+  Guid:
+    Data1: 1050849167
+    Data2: 1115018066
+    Data3: 229033387
+    Data4: 380617965
+  Banks:
+  - {fileID: 2061695518484743490}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -1284282583989471903}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &8811783834283822968
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,7 +441,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/CarEngine/RPM
+  m_Name: parameter:/86_BOXER_ENGINE/RPM
   m_EditorClassIdentifier: 
   Name: RPM
   StudioPath: 

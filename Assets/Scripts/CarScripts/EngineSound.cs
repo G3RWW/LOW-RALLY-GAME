@@ -56,7 +56,8 @@ public class EngineSoundFMOD : MonoBehaviour
         float clampedRPM = Mathf.Clamp(car.currentRPM, minRPM, maxRPM);
         engineInstance.setParameterByName("RPM", clampedRPM);
 
-        engineInstance.setVolume(volume);// 🎚️ Inspector slider
+        float finalVolume = volume * UISettingsManager.Instance.engineVolume;
+        engineInstance.setVolume(finalVolume);
 
     }
 

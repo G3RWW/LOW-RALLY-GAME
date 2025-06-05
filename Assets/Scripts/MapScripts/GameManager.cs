@@ -12,10 +12,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Car Identification")]
     public string carTag = "car";
+    public string PlayercarTag = "playerCar";
     public string carLayerName = "AICar";
     public string obstacleLayerName = "Obstacle";
-
-
     private List<GameObject> spawnedCars = new List<GameObject>();
     private Dictionary<GameObject, LapTimer> carLapTimers = new Dictionary<GameObject, LapTimer>();
 
@@ -157,7 +156,7 @@ public class GameManager : MonoBehaviour
 
     void SetupCar(GameObject car, bool isAI, int index)
     {
-        car.tag = carTag;
+        car.tag = isAI ? carTag : PlayercarTag;
         car.layer = LayerMask.NameToLayer(carLayerName);
         spawnedCars.Add(car);
 
@@ -228,6 +227,7 @@ public class GameManager : MonoBehaviour
 
         var carController = playerCar.GetComponent<CarController>();
         var lapTimer = playerCar.GetComponent<LapTimer>();
+        
 
         if (rallyCamera != null)
         {
@@ -265,5 +265,15 @@ public class GameManager : MonoBehaviour
             Debug.Log($"🕒 Lap UI assigned to: {playerCar.name}");
         }
     }
+    public void SetShowRPMBar(bool value)
+    {
+        showRPMBar = value;
+        if (rpmBarObject != null) rpmBarObject.SetActive(value);
+    }
 
+    public void SetShowRPMNeedle(bool value)
+    {
+        showRPMNeedle = value;
+        if (analogSpeedMeterObject != null) analogSpeedMeterObject.SetActive(value);
+    }
 }

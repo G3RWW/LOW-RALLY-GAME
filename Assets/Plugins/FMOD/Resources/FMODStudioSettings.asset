@@ -463,8 +463,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: ../../../Desktop/AUDIO-FILES/fuckmode/86/86.fspro
-  sourceBankPath: ../../../Desktop/AUDIO-FILES/fuckmode/86/Build
+  sourceProjectPath: ../../AUDIO-FILES/fuckmode/86/86.fspro
+  sourceBankPath: ../../AUDIO-FILES/fuckmode/86/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -474,8 +474,8 @@ MonoBehaviour:
   EncryptionKey: 
   ImportType: 0
   TargetAssetPath: FMODBanks
-  TargetBankFolder: 
-  EventLinkage: 0
+  TargetBankFolder: C:\Users\G3RWW\Desktop\GAME\LOW-RALLY-GAME\Assets\StreamingAssets
+  EventLinkage: 1
   LoggingLevel: 2
   SpeakerModeSettings: []
   SampleRateSettings: []
@@ -487,7 +487,9 @@ MonoBehaviour:
   Plugins: []
   MasterBanks:
   - Master
-  Banks: []
+  Banks:
+  - CAR SOUNDS
+  - MUSIC
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
