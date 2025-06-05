@@ -42,8 +42,8 @@ public class GameManager : MonoBehaviour
     public RectTransform rpmNeedle;
 
     [Header("RPM UI Toggles")]
-    public bool showRPMBar = true;
-    public bool showRPMNeedle = false;
+    public bool showRPMBar;
+    public bool showRPMNeedle;
 
     [Header("RPM UI Objects")]
     public GameObject rpmBarObject;
@@ -70,7 +70,11 @@ public class GameManager : MonoBehaviour
             return;
 
         }
+        showRPMBar = RPMSettingsManager.Instance.ShowRPMBar;
+        showRPMNeedle = RPMSettingsManager.Instance.ShowRPMNeedle;
         ApplyRPMUIVisibility();
+
+
         SpawnCars(); // Keep your original flow
 
     }
@@ -110,19 +114,16 @@ public class GameManager : MonoBehaviour
             Debug.Log($"🏁 {car.name} finished the race! Total Time: {timer.GetTotalTime():F2}s");
         }
     }
-
     public int GetCarLap(GameObject car)
     {
         return carLapTimers.TryGetValue(car, out LapTimer timer) ? timer.completedLaps : 0;
     }
-
     public float GetCarTime(GameObject car)
     {
         return carLapTimers.TryGetValue(car, out LapTimer timer)
             ? timer.GetTotalTime()
             : 9999f;
     }
-
     public int GetPosition(GameObject car)
     {
         int position = 1;
@@ -144,7 +145,6 @@ public class GameManager : MonoBehaviour
 
         return position;
     }
-
     void ApplyRPMUIVisibility()
     {
         if (rpmBarObject != null)
@@ -153,7 +153,6 @@ public class GameManager : MonoBehaviour
         if (analogSpeedMeterObject != null)
             analogSpeedMeterObject.SetActive(showRPMNeedle);
     }
-
     void SetupCar(GameObject car, bool isAI, int index)
     {
         car.tag = isAI ? carTag : PlayercarTag;
@@ -167,28 +166,28 @@ public class GameManager : MonoBehaviour
         if (carController != null) carController.isAIControlled = isAI;
 
         if (aiController != null)
-    {
-        if (isAI)
         {
-            aiController.enabled = true;
-            aiController.aiBehavior = aiBehaviors.Length > index ? aiBehaviors[index] : AIBehaviorType.Careful;
-            aiController.carLayer = LayerMask.GetMask(carLayerName);
-            aiController.obstacleLayers = LayerMask.GetMask(obstacleLayerName);
-            aiController.wayPointContainer = wayPointContainer;
-            aiController.jokerLapWaypointContainer = jokerLapWaypointContainer;
-            aiController.jokerLapExitPoint = jokerLapExitPoint;
+            if (isAI)
+            {
+                aiController.enabled = true;
+                aiController.aiBehavior = aiBehaviors.Length > index ? aiBehaviors[index] : AIBehaviorType.Careful;
+                aiController.carLayer = LayerMask.GetMask(carLayerName);
+                aiController.obstacleLayers = LayerMask.GetMask(obstacleLayerName);
+                aiController.wayPointContainer = wayPointContainer;
+                aiController.jokerLapWaypointContainer = jokerLapWaypointContainer;
+                aiController.jokerLapExitPoint = jokerLapExitPoint;
 
-            GameObject normalParent = new($"{car.name}_Waypoints");
-            aiController.waypoints = CloneWaypoints(wayPointContainer.waypoints, normalParent.transform, car.name + "_WP");
+                GameObject normalParent = new($"{car.name}_Waypoints");
+                aiController.waypoints = CloneWaypoints(wayPointContainer.waypoints, normalParent.transform, car.name + "_WP");
 
-            GameObject jokerParent = new($"{car.name}_JokerWaypoints");
-            aiController.jokerWaypoints = CloneWaypoints(jokerLapWaypointContainer.waypoints, jokerParent.transform, car.name + "_JWP");
+                GameObject jokerParent = new($"{car.name}_JokerWaypoints");
+                aiController.jokerWaypoints = CloneWaypoints(jokerLapWaypointContainer.waypoints, jokerParent.transform, car.name + "_JWP");
+            }
+            else
+            {
+                aiController.enabled = false; // ✅ Disable AI on player car
+            }
         }
-        else
-        {
-            aiController.enabled = false; // ✅ Disable AI on player car
-        }
-    }
 
 
         if (lapTimer != null)
@@ -200,7 +199,6 @@ public class GameManager : MonoBehaviour
             carLapTimers[car] = lapTimer;
         }
     }
-    
     List<Transform> CloneWaypoints(List<Transform> source, Transform parent, string prefix)
     {
         var list = new List<Transform>();
@@ -214,7 +212,6 @@ public class GameManager : MonoBehaviour
         }
         return list;
     }
-
     void AssignPlayerCameraAndUI()
     {
         if (playerCarIndex >= spawnedCars.Count)
@@ -270,7 +267,6 @@ public class GameManager : MonoBehaviour
         showRPMBar = value;
         if (rpmBarObject != null) rpmBarObject.SetActive(value);
     }
-
     public void SetShowRPMNeedle(bool value)
     {
         showRPMNeedle = value;

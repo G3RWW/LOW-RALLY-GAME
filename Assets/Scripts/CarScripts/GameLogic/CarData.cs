@@ -10,10 +10,6 @@ public class CarData : ScriptableObject
     public float handbrakeTorque = 3000f;
     public float rollingResistance = 0.1f; // Adjust based on vehicle weight
     public float engineBraking = 50f; // Higher value = stronger engine braking effect
-
-    public bool isAutomatic = true;
-    public bool isClutchAuto = true;
-
     [Header("RPM & Gearing")]
     public float idleRPM = 900f;
     public float UpShiftRPM = 6000f;
@@ -41,7 +37,7 @@ public class CarData : ScriptableObject
     new Keyframe(100, 0.8f), // Reduced sensitivity at high speed
     new Keyframe(150, 0.6f),
     new Keyframe(200, 0.5f)
-);
+    );
 
     public float driftSteerAssist = 0.5f; // :rocket: Adds small counter-steering when drifting
     public float gripReductionFactor = 0.6f; // :wheel: Reduces grip dynamically based on steering input
@@ -57,3 +53,4 @@ public enum DrivetrainType
     RWD, // Rear-Wheel Drive
     AWD  // All-Wheel Drive
 }
+

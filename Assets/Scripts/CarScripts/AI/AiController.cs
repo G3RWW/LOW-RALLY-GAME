@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+
     public enum AIBehaviorType
     {
         Careful,
@@ -17,6 +18,7 @@ using System.Collections.Generic;
         Overtaking,
         Recovery
     }
+
 
     
 public class AICarController : MonoBehaviour

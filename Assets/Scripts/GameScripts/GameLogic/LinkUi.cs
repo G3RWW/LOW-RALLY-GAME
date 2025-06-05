@@ -1,14 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LinkUI : MonoBehaviour
+public class FMODAudioUI : MonoBehaviour
 {
+    [Header("Audio Sliders")]
     public Slider masterSlider;
     public Slider engineSlider;
     public Slider musicSlider;
 
+    [Header("RPM Display Toggles")]
     public Toggle rpmBarToggle;
     public Toggle rpmNeedleToggle;
+
+    [Header("Gearbox Mode Toggles")]
+    public Toggle manualToggle;
+    public Toggle autoToggle;
 
     void Start()
     {
@@ -24,11 +30,11 @@ public class LinkUI : MonoBehaviour
         engineSlider.onValueChanged.AddListener(audio.SetEngineVolume);
         musicSlider.onValueChanged.AddListener(audio.SetMusicVolume);
 
-        // Load RPM toggle states
+        // Set initial RPM toggle states
         rpmBarToggle.SetIsOnWithoutNotify(RPMSettingsManager.Instance.ShowRPMBar);
         rpmNeedleToggle.SetIsOnWithoutNotify(RPMSettingsManager.Instance.ShowRPMNeedle);
 
-        // Bind toggle changes with mutual exclusivity
+        // RPM display logic (mutually exclusive)
         rpmBarToggle.onValueChanged.AddListener(value =>
         {
             if (value)
@@ -39,8 +45,7 @@ public class LinkUI : MonoBehaviour
             }
             else if (!rpmNeedleToggle.isOn)
             {
-                // Prevent both off: revert back
-                rpmBarToggle.SetIsOnWithoutNotify(true);
+                rpmBarToggle.SetIsOnWithoutNotify(true); // Prevent both off
             }
         });
 
@@ -54,8 +59,38 @@ public class LinkUI : MonoBehaviour
             }
             else if (!rpmBarToggle.isOn)
             {
-                // Prevent both off: revert back
-                rpmNeedleToggle.SetIsOnWithoutNotify(true);
+                rpmNeedleToggle.SetIsOnWithoutNotify(true); // Prevent both off
+            }
+        });
+
+        // Set initial gearbox toggle states
+        manualToggle.SetIsOnWithoutNotify(GearboxSettingsManager.Instance.UseManual);
+        autoToggle.SetIsOnWithoutNotify(!GearboxSettingsManager.Instance.UseManual);
+
+        // Gearbox toggle logic (mutually exclusive)
+        manualToggle.onValueChanged.AddListener(value =>
+        {
+            if (value)
+            {
+                autoToggle.SetIsOnWithoutNotify(false);
+                OnGearboxToggleChanged(true);
+            }
+            else if (!autoToggle.isOn)
+            {
+                manualToggle.SetIsOnWithoutNotify(true); // Prevent both off
+            }
+        });
+
+        autoToggle.onValueChanged.AddListener(value =>
+        {
+            if (value)
+            {
+                manualToggle.SetIsOnWithoutNotify(false);
+                OnGearboxToggleChanged(false);
+            }
+            else if (!manualToggle.isOn)
+            {
+                autoToggle.SetIsOnWithoutNotify(true); // Prevent both off
             }
         });
     }
@@ -74,6 +109,11 @@ public class LinkUI : MonoBehaviour
 
         var gm = FindObjectOfType<GameManager>();
         if (gm != null) gm.SetShowRPMNeedle(value);
+    }
+
+    void OnGearboxToggleChanged(bool useManual)
+    {
+        GearboxSettingsManager.Instance.SetManual(useManual);
     }
 
     private void OnDisable()

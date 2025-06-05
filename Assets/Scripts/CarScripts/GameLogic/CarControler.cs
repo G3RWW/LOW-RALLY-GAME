@@ -68,6 +68,7 @@ public class CarController : MonoBehaviour
 
     [Header("AI Control")]
     public bool isAIControlled = false; // If true, blocks player input
+    public bool forceAutomatic = false;
 
     [Header("FX")]
     public GameObject dirtParticlePrefab;
@@ -162,8 +163,6 @@ public class CarController : MonoBehaviour
             float steer = Input.GetAxis("Horizontal") * carData.maxSteerAngle;
             isBraking = Input.GetKey(KeyCode.S);
             isHandbraking = Input.GetKey(KeyCode.Space);
-            isAutomatic = carData.isAutomatic;
-            isClutchAuto = carData.isClutchAuto;
 
             HandleSteering(steer);
         }
