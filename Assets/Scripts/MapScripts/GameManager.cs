@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+
 public class GameManager : MonoBehaviour
 {
     [Header("Car Setup")]
@@ -48,6 +50,11 @@ public class GameManager : MonoBehaviour
     [Header("RPM UI Objects")]
     public GameObject rpmBarObject;
     public GameObject analogSpeedMeterObject;
+    [Header("Race Start Timer")]
+    public float countdownTime = 3f;
+    public UnityEngine.UI.Text countdownText;
+
+    private bool raceStarted = false;
 
 
     [Header("Lap UI")]
@@ -76,7 +83,7 @@ public class GameManager : MonoBehaviour
 
 
         SpawnCars(); // Keep your original flow
-
+        StartCoroutine(RaceStartCountdown());
     }
     void SpawnCars()
     {
@@ -224,7 +231,7 @@ public class GameManager : MonoBehaviour
 
         var carController = playerCar.GetComponent<CarController>();
         var lapTimer = playerCar.GetComponent<LapTimer>();
-        
+
 
         if (rallyCamera != null)
         {
@@ -271,5 +278,35 @@ public class GameManager : MonoBehaviour
     {
         showRPMNeedle = value;
         if (analogSpeedMeterObject != null) analogSpeedMeterObject.SetActive(value);
+    }
+    private IEnumerator RaceStartCountdown()
+    {
+        countdownText.gameObject.SetActive(true);
+        float timeLeft = countdownTime;
+
+        while (timeLeft > 0)
+        {
+            countdownText.text = Mathf.Ceil(timeLeft).ToString("F0");
+            yield return new WaitForSeconds(1f);
+            timeLeft--;
+        }
+
+        countdownText.text = "GO!";
+        yield return new WaitForSeconds(1f);
+        countdownText.gameObject.SetActive(false);
+
+        // ✅ Trigger AI driving state
+        foreach (var car in spawnedCars)
+        {
+            if (car.CompareTag(carTag)) // Only AI cars
+            {
+                var ai = car.GetComponent<AICarController>();
+                if (ai != null)
+                    ai.ForceStartDriving();
+            }
+        }
+
+        // ✅ Also let player control start now, if needed
+        raceStarted = true;
     }
 }

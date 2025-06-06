@@ -13,19 +13,17 @@ MonoBehaviour:
   m_Name: 86
   m_EditorClassIdentifier: 
   maxSteerAngle: 30
-  motorPower: 500
+  motorPower: 300
   brakeTorque: 1800
   handbrakeTorque: 3000
   rollingResistance: 0.1
   engineBraking: 50
-  isAutomatic: 1
-  isClutchAuto: 1
   idleRPM: 900
-  UpShiftRPM: 6500
+  UpShiftRPM: 5000
   DownShiftRPM: 2500
   differentialRatio: 4.1
   redline: 7000
-  finalDriveRatio: 4.1
+  finalDriveRatio: 1
   hpToRPMCurve:
     serializedVersion: 2
     m_Curve:
@@ -78,14 +76,14 @@ MonoBehaviour:
     m_PostInfinity: 1
     m_RotationOrder: 4
   gearRatios:
-  - 3.5
+  - 3.416
   - 0
-  - 2.6
-  - 2.2
-  - 1.5
-  - 1.2
+  - 3.626
+  - 2.188
+  - 1.541
+  - 1.213
   - 1
-  - 0.77
+  - 0.767
   forwardFrictionStiffness: 1
   sidewaysFrictionStiffness: 0.4
   drivetrain: 1

@@ -26,7 +26,7 @@ public class AICarController : MonoBehaviour
     [Header("Waypoint Navigation")]
     public WayPointContainerScript wayPointContainer;
     public List<Transform> waypoints = new List<Transform>();
-    private int currentWaypointIndex = 0;
+    public int currentWaypointIndex = 0;
     public float waypointRange = 0.5f; // AI must be within 0.5m of the waypoint before switching
     private HashSet<Transform> visitedWaypoints = new HashSet<Transform>();
 
@@ -40,7 +40,7 @@ public class AICarController : MonoBehaviour
     private float currentAngle;
     private float AiGasInput;
     public bool IsInsideBrakeZone = false;
-    public float AiMaxAngle = 45f;
+    public float AiMaxAngle = 60f;
     public float brakingLookaheadDistance = 15f;
     private float smoothSteering = 0f;
     private float targetSpeed = 25f; // AI adapts speed based on upcoming turns
@@ -48,7 +48,7 @@ public class AICarController : MonoBehaviour
     private float maxStraightSpeed = 30f; // Maximum speed on straight roads
 
     [Header("Obstacle Avoidance")]
-    public float baseObstacleRange = 10f;
+    public float baseObstacleRange = 20f;
     public LayerMask obstacleLayers;
     public LayerMask carLayer;
 
@@ -85,8 +85,6 @@ public class AICarController : MonoBehaviour
     private Transform currentJokerLapEntry;
     [Header("Joker Lap Settings")]
     public Transform jokerLapExitRejoinPoint; // <- drag Waypoint (40) here in Inspector
-
-
     [Header("Debugging")]
     private int lapCount = 0;
     private float lapTimer = 0f;
@@ -94,23 +92,20 @@ public class AICarController : MonoBehaviour
     {
         Debug.Log($"[{gameObject.name}] {message}");
     }
-
     private void LogWarning(string message)
     {
         Debug.LogWarning($"[{gameObject.name}] {message}");
     }
-
     private void LogError(string message)
     {
         Debug.LogError($"[{gameObject.name}] {message}");
     }
-
-
     [Header("Recovery Mode")]
     private bool isInRecoveryMode = false;
     private float recoveryTimer = 0f;
     private float maxRecoveryTime = 5f;
     private Vector3 recoveryTarget;
+    private int lastValidWaypointIndex = 0;
 
     [Header("Debugging Toggles")]
     public bool debugSteeringLine = false;
@@ -125,6 +120,8 @@ public class AICarController : MonoBehaviour
     [SerializeField] private bool debugDrawStraightLine = false;
     [SerializeField] private bool debugDrawBezierCurve = false;
     private AIState currentState = AIState.Idle;
+    //=================================================================================================================================================================================================================================================
+    // Initialization
     void Start()
     {
         carController = GetComponent<CarController>();
@@ -228,12 +225,24 @@ public class AICarController : MonoBehaviour
         Log($"AI State: {currentState}");
 
     }
+    void LateUpdate()
+    {
+        if (agentFollower)
+        {
+            agentFollower.nextPosition = transform.position;
+            agentFollower.velocity = Vector3.zero;
+        }
+    }
+    //=================================================================================================================================================================================================================================================
+    // State Handlers
     void HandleIdleState()
     {
+        /*
         if (IsOnNavMesh(transform.position))
         {
             currentState = AIState.Driving;
         }
+        */
     }
     void HandleDrivingState()
     {
@@ -345,8 +354,11 @@ public class AICarController : MonoBehaviour
 
             // Smooth steering and gas input
             smoothSteering = Mathf.Lerp(smoothSteering, steerAmount, Time.deltaTime * 3f);
-            targetSpeed = Mathf.Min(maxStraightSpeed * overtakeBoost, maxStraightSpeed + 15f);
-            currentGasInput = Mathf.Lerp(currentGasInput, 1f, Time.deltaTime * 2f);
+            float tightTurnSpeed = Mathf.Max(minTurnSpeed * 0.8f, 8f);
+            targetSpeed = Mathf.Lerp(tightTurnSpeed, maxStraightSpeed * overtakeBoost, 0.4f);
+            // Apply gas input based on target speed
+            currentGasInput = Mathf.Lerp(currentGasInput, 0.7f, Time.deltaTime * 1.5f); // Slower accel
+
 
             // Apply AI controls
             carController.SetAISteering(smoothSteering);
@@ -376,96 +388,77 @@ public class AICarController : MonoBehaviour
         // If stuck too long, force teleport to recovery target
         if (recoveryTimer > maxRecoveryTime)
         {
-            transform.position = recoveryTarget;
+            // Force respawn at last valid waypoint
+            List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
+            int index = Mathf.Clamp(lastValidWaypointIndex, 0, currentPath.Count - 2); // prevent out of bounds
+            Transform lastWaypoint = currentPath[index];
+            Transform nextWaypoint = currentPath[index + 1];
+
+            Vector3 position = lastWaypoint.position;
+            Vector3 forward = (nextWaypoint.position - lastWaypoint.position).normalized;
+
+            transform.position = position;
+            transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+            carController._rigidbody.linearVelocity = Vector3.zero;
+            carController._rigidbody.angularVelocity = Vector3.zero;
+
+            LogWarning($"🚨 Teleported to WP {index} for recovery, facing WP {index + 1}");
+
+            isInRecoveryMode = false;
             currentState = AIState.Driving;
         }
+
     }
-    bool CheckWaypointAvailability() 
+    public void ForceStartDriving()
     {
-        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
-        return currentPath.Count > 0;
+        currentState = AIState.Driving;
+        Debug.Log($"▶️ {name} forced into Driving state.");
     }
-    Transform GetCurrentTargetWaypoint()
-    {
-        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
-        int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
-        if (index >= currentPath.Count) return null;
 
-        Transform target = currentPath[index];
-        if (!target)
-        {
-            LogWarning($"❌ Missing waypoint {index}.");
-            if (isTakingJokerLap) jokerWaypointIndex++;
-            else NextWaypoint();
-        }
-        return target;
-    }
-    void UpdateNavMeshAgent(Transform targetWaypoint)
-    {
-        if (!IsOnNavMesh(transform.position))
-        {
-            if (!isInRecoveryMode)
-            {
-                isInRecoveryMode = true;
-                recoveryTimer = 0f;
-
-                if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 10f, NavMesh.AllAreas))
-                {
-                    recoveryTarget = hit.position;
-                    //Log($"🔁 Off NavMesh - entering recovery mode to {recoveryTarget}");
-                }
-            }
-        }
-
-        if (isInRecoveryMode)
-        {
-            recoveryTimer += Time.deltaTime;
-            agentFollower.SetDestination(recoveryTarget);
-            // ⚪ White: Recovery path line
-            if (debugNavMeshRecovery)
-                Debug.DrawLine(transform.position, recoveryTarget, Color.white);
-
-
-            if (IsOnNavMesh(transform.position))
-            {
-                //Log("✅ Recovered onto NavMesh.");
-                isInRecoveryMode = false;
-            }
-            else if (recoveryTimer > maxRecoveryTime)
-            {
-                //LogWarning("❌ Recovery failed, teleporting to last valid NavMesh position.");
-                transform.position = recoveryTarget;
-                isInRecoveryMode = false;
-            }
-        }
-        else
-        {
-            agentFollower.SetDestination(targetWaypoint.position);
-        }
-    }
+    //=================================================================================================================================================================================================================================================
+    // AI Logic
     void ApplySteering()
     {
         List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
         int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
-
         if (index >= currentPath.Count - 1) return;
 
         Vector3 start = transform.position;
-        Vector3 control = currentPath[index].position;
+        Transform control = currentPath[index];
+        Vector3 controlPos = control.position;
+
         Vector3 end = currentPath[index + 1].position;
 
-        // Inner line = tighter turns for aggressive drivers
         float t = (aiBehavior == AIBehaviorType.Aggressive) ? 0.2f : 0.4f;
-
 
         Vector3 bezierTarget =
             Mathf.Pow(1 - t, 2) * start +
-            2 * (1 - t) * t * control +
+            2 * (1 - t) * t * controlPos +
             Mathf.Pow(t, 2) * end;
 
-        // ✅ Clamp the Bezier target away from NavMesh edge
-        Vector3 clampedTarget = GetNavMeshEdgeClamp(bezierTarget, 1.2f);
+        // === NEW SIDE OFFSET LOGIC ===
+        float laneOffsetAmount = 0f;
 
+        // Check if overtaking
+        if (currentState == AIState.Overtaking)
+            laneOffsetAmount = (overtakeTargetOffset.x > 0f) ? +2.5f : -2.5f;
+
+        // Check for WaypointSideBias
+        var biasComp = control.GetComponent<WaypointSideBias>();
+        if (biasComp != null)
+        {
+            switch (biasComp.preferredSide)
+            {
+                case WaypointSideBias.RoadSide.Left: laneOffsetAmount = +2f; break;
+                case WaypointSideBias.RoadSide.Right: laneOffsetAmount = -2f; break;
+            }
+        }
+
+        Vector3 lateralOffset = Vector3.Cross(Vector3.up, end - controlPos).normalized * laneOffsetAmount;
+        bezierTarget += lateralOffset;
+        // === END SIDE OFFSET LOGIC ===
+
+        Vector3 clampedTarget = GetNavMeshEdgeClamp(bezierTarget, 1.2f);
         Vector3 steerDirection = (clampedTarget - transform.position).normalized;
         currentAngle = Vector3.SignedAngle(transform.forward, steerDirection, Vector3.up);
 
@@ -474,11 +467,12 @@ public class AICarController : MonoBehaviour
         carController.SetAISteering(smoothSteering);
 
         if (debugDrawStraightLine)
-            Debug.DrawLine(control, end, Color.red);
+            Debug.DrawLine(controlPos, end, Color.red);
 
         if (debugDrawBezierCurve)
             Debug.DrawLine(transform.position, clampedTarget, Color.blue);
     }
+
     void ApplyThrottleAndBrakes()
     {
         float speed = carController._rigidbody.linearVelocity.magnitude;
@@ -498,102 +492,28 @@ public class AICarController : MonoBehaviour
         carController.SetAIGas(currentGasInput);
         carController.SetAIBrake(currentBrakeInput > 0.05f);
     }
-    void CheckProximityToWaypoint()
+    void AdjustSpeedBeforeTurn()
     {
-        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
-        int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
+        int nextIndex = (currentWaypointIndex + 1) % waypoints.Count;
+        Transform nextWaypoint = waypoints[nextIndex];
+        if (!nextWaypoint) return;
 
-        if (index >= currentPath.Count) return;
+        Vector3 nextDirection = (nextWaypoint.position - transform.position).normalized;
+        float nextAngle = Vector3.SignedAngle(transform.forward, nextDirection, Vector3.up);
+        float angleSeverity = Mathf.Abs(nextAngle);
 
-        Transform wp = currentPath[index];
-        float distance = Vector3.Distance(transform.position, wp.position);
-
-        // NEW: Check if it's behind the car
-        Vector3 toWaypoint = (wp.position - transform.position).normalized;
-        float forwardDot = Vector3.Dot(transform.forward, toWaypoint); // forward = 1, behind = -1
-
-        bool isBehind = forwardDot < 0f;
-        bool isCloseEnough = distance < waypointRange;
-
-        if (isCloseEnough || isBehind)
+        if (angleSeverity > 60f)
+            targetSpeed = minTurnSpeed;      // Very sharp
+        else if (angleSeverity > 40f)
+            targetSpeed = 15f;               // Medium
+        else if (angleSeverity > 20f)
+            targetSpeed = 22f;               // Small bend
+        else
+            targetSpeed = maxStraightSpeed; // Almost straight
+        if(debugSpeedAdjustment)
         {
-            if (isTakingJokerLap)
-            {
-                // ONLY continue if this is the current expected Joker waypoint
-                if (wp == jokerWaypoints[jokerWaypointIndex])
-                    NextJokerWaypoint();
-            }
-            else
-            {
-                if (visitedWaypoints.Contains(wp)) return;
+            Log($"🌀 Adjusting AI Speed: {targetSpeed:F2} for turn angle: {nextAngle:F2}°");
 
-                // ONLY continue if this is the current expected waypoint
-                if (wp == waypoints[currentWaypointIndex])
-                    NextWaypoint();
-            }
-        }
-    }
-    void DrawDebugLines()
-    {
-        if (debugWaypointPath)
-        {
-            Vector3 dir = (agentFollower.destination - transform.position).normalized;
-            Debug.DrawRay(transform.position, dir * 5f, Color.cyan);
-            Debug.DrawRay(transform.position, transform.forward * 5f, Color.yellow);
-        }
-
-        if (isTakingJokerLap && debugJokerLapPath)
-        {
-            Debug.DrawRay(
-                transform.position + Vector3.up * 1f,
-                (jokerWaypoints[jokerWaypointIndex].position - transform.position).normalized * 5f,
-                Color.magenta
-            );
-        }
-    }
-    void NextWaypoint()
-    {
-        currentWaypointIndex++;
-
-        if (currentWaypointIndex >= waypoints.Count)
-        {
-            currentWaypointIndex = 1; // Skip index 0 to avoid instant lap spam
-            lapCount++;
-
-            Log($"🏁 {name} finished lap {lapCount}");
-
-            if (!hasTakenJokerLap)
-            {
-                float chance = 0.4f;
-                shouldTakeJokerLap = Random.value < chance;
-                Log(shouldTakeJokerLap ? $"🃏 {name} will take Joker Lap!" : $"➡️ {name} will skip Joker Lap.");
-            }
-        }
-    }
-    void NextJokerWaypoint()
-    {
-        jokerWaypointIndex++;
-        if (jokerWaypointIndex >= jokerWaypoints.Count)
-        {
-            Log("🃏 Joker Lap path complete → reconnecting to normal path at specific rejoin point");
-
-            isTakingJokerLap = false;
-            hasTakenJokerLap = true;
-            jokerLapStage = JokerLapStage.None;
-            jokerWaypointIndex = 0;
-
-            if (jokerLapExitRejoinPoint != null && waypoints.Contains(jokerLapExitRejoinPoint))
-            {
-                currentWaypointIndex = waypoints.IndexOf(jokerLapExitRejoinPoint);
-                Log($"🔁 Reconnected to normal path at WP {currentWaypointIndex} ({jokerLapExitRejoinPoint.name})");
-            }
-            else
-            {
-                LogWarning("⚠️ JokerLapExitRejoinPoint is not assigned or not found in waypoints list! Falling back.");
-                currentWaypointIndex = Mathf.Max(waypoints.Count - 2, 0);
-            }
-
-            visitedWaypoints.Clear();
         }
     }
     float CalculateBraking()
@@ -658,82 +578,108 @@ public class AICarController : MonoBehaviour
 
         return Mathf.Clamp01(brakeStrength);
     }
-    private bool IsPositionSafeOnNavMesh(Vector3 position, float edgeThreshold = 0.5f)
+    //=================================================================================================================================================================================================================================================
+    // Waypoint Navigation
+    bool CheckWaypointAvailability() 
     {
-        if (NavMesh.SamplePosition(position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-        {
-            if (NavMesh.FindClosestEdge(hit.position, out NavMeshHit edgeHit, NavMesh.AllAreas))
-            {
-                float distanceToEdge = Vector3.Distance(hit.position, edgeHit.position);
-                Debug.DrawLine(hit.position, edgeHit.position, new Color(1f, 0.5f, 0f)); // 🟠 Orange: Distance to edge
+        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
+        return currentPath.Count > 0;
+    }
+    Transform GetCurrentTargetWaypoint()
+    {
+        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
+        int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
+        if (index >= currentPath.Count) return null;
 
-                return distanceToEdge >= edgeThreshold;
+        Transform target = currentPath[index];
+        if (!target)
+        {
+            LogWarning($"❌ Missing waypoint {index}.");
+            if (isTakingJokerLap) jokerWaypointIndex++;
+            else NextWaypoint();
+        }
+        return target;
+    }
+    void CheckProximityToWaypoint()
+    {
+        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
+        int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
+
+        if (index >= currentPath.Count) return;
+
+        Transform wp = currentPath[index];
+        float distance = Vector3.Distance(transform.position, wp.position);
+
+        // NEW: Check if it's behind the car
+        Vector3 toWaypoint = (wp.position - transform.position).normalized;
+        float forwardDot = Vector3.Dot(transform.forward, toWaypoint); // forward = 1, behind = -1
+
+        bool isBehind = forwardDot < 0f;
+        bool isCloseEnough = distance < waypointRange;
+
+        if (isCloseEnough || isBehind)
+        {
+            if (isTakingJokerLap)
+            {
+                // ONLY continue if this is the current expected Joker waypoint
+                if (wp == jokerWaypoints[jokerWaypointIndex])
+                    NextJokerWaypoint();
+                    lastValidWaypointIndex = currentWaypointIndex;
+            }
+            else
+            {
+                if (visitedWaypoints.Contains(wp)) return;
+
+                // ONLY continue if this is the current expected waypoint
+                if (wp == waypoints[currentWaypointIndex])
+                    NextWaypoint();
+                    lastValidWaypointIndex = currentWaypointIndex;
             }
         }
-        return false; // Not on NavMesh or too close to edge
     }
-    private bool PredictFutureTrajectoryOffNavMesh(Vector3 position, Vector3 direction, float speed, float steeringInput)
+    void NextWaypoint()
     {
-        // Predict further at higher speeds (e.g., 1.5s at 30 speed → 3s at 60 speed)
-        float basePredictionTime = 1.5f;
-        float predictionDuration = basePredictionTime + (speed / 20f); // Scales with speed
-        int steps = 10;
-        float timeStep = predictionDuration / steps;
+        currentWaypointIndex++;
 
-        Vector3 simPos = position;
-        Vector3 simDir = direction.normalized;
-
-        for (int i = 0; i < steps; i++)
+        if (currentWaypointIndex >= waypoints.Count)
         {
-            float turnAmount = steeringInput * AiMaxAngle;
-            simDir = Quaternion.Euler(0f, turnAmount * timeStep, 0f) * simDir;
-            simPos += simDir * speed * timeStep;
+            currentWaypointIndex = 1; // Skip index 0 to avoid instant lap spam
+            lapCount++;
 
-            if (!IsPositionSafeOnNavMesh(simPos, 1f))
+            Log($"🏁 {name} finished lap {lapCount}");
+
+            if (!hasTakenJokerLap)
             {
-                if (debugTrajectoryPrediction)
-                Debug.DrawRay(simPos, Vector3.up * 2f, Color.red, 1f); // 🔴 unsafe
+                float chance = 0.4f;
+                shouldTakeJokerLap = Random.value < chance;
+                Log(shouldTakeJokerLap ? $"🃏 {name} will take Joker Lap!" : $"➡️ {name} will skip Joker Lap.");
+            }
+        }
+    }
+    void NextJokerWaypoint()
+    {
+        jokerWaypointIndex++;
+        if (jokerWaypointIndex >= jokerWaypoints.Count)
+        {
+            Log("🃏 Joker Lap path complete → reconnecting to normal path at specific rejoin point");
 
-                return true;
+            isTakingJokerLap = false;
+            hasTakenJokerLap = true;
+            jokerLapStage = JokerLapStage.None;
+            jokerWaypointIndex = 0;
+
+            if (jokerLapExitRejoinPoint != null && waypoints.Contains(jokerLapExitRejoinPoint))
+            {
+                currentWaypointIndex = waypoints.IndexOf(jokerLapExitRejoinPoint);
+                Log($"🔁 Reconnected to normal path at WP {currentWaypointIndex} ({jokerLapExitRejoinPoint.name})");
+            }
+            else
+            {
+                LogWarning("⚠️ JokerLapExitRejoinPoint is not assigned or not found in waypoints list! Falling back.");
+                currentWaypointIndex = Mathf.Max(waypoints.Count - 2, 0);
             }
 
-            if (debugTrajectoryPrediction)
-            Debug.DrawRay(simPos, Vector3.up * 2f, Color.green, 0.5f); // ✅ safe
-
-        }
-
-        return false;
-    }
-    void AdjustSpeedBeforeTurn()
-    {
-        int nextIndex = (currentWaypointIndex + 1) % waypoints.Count;
-        Transform nextWaypoint = waypoints[nextIndex];
-        if (!nextWaypoint) return;
-
-        Vector3 nextDirection = (nextWaypoint.position - transform.position).normalized;
-        float nextAngle = Vector3.SignedAngle(transform.forward, nextDirection, Vector3.up);
-        float angleSeverity = Mathf.Abs(nextAngle);
-
-        if (angleSeverity > 60f)
-            targetSpeed = minTurnSpeed;      // Very sharp
-        else if (angleSeverity > 40f)
-            targetSpeed = 15f;               // Medium
-        else if (angleSeverity > 20f)
-            targetSpeed = 22f;               // Small bend
-        else
-            targetSpeed = maxStraightSpeed; // Almost straight
-        if(debugSpeedAdjustment)
-        {
-            Log($"🌀 Adjusting AI Speed: {targetSpeed:F2} for turn angle: {nextAngle:F2}°");
-
-        }
-    }
-    void LateUpdate()
-    {
-        if (agentFollower)
-        {
-            agentFollower.nextPosition = transform.position;
-            agentFollower.velocity = Vector3.zero;
+            visitedWaypoints.Clear();
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -818,6 +764,97 @@ public class AICarController : MonoBehaviour
 
         return closest;
     }
+    //=================================================================================================================================================================================================================================================
+    // NavMesh Handling
+    void UpdateNavMeshAgent(Transform targetWaypoint)
+    {
+        if (!IsOnNavMesh(transform.position))
+        {
+            if (!isInRecoveryMode)
+            {
+                isInRecoveryMode = true;
+                recoveryTimer = 0f;
+
+                if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+                {
+                    recoveryTarget = hit.position;
+                    //Log($"🔁 Off NavMesh - entering recovery mode to {recoveryTarget}");
+                }
+            }
+        }
+
+        if (isInRecoveryMode)
+        {
+            recoveryTimer += Time.deltaTime;
+            agentFollower.SetDestination(recoveryTarget);
+            // ⚪ White: Recovery path line
+            if (debugNavMeshRecovery)
+                Debug.DrawLine(transform.position, recoveryTarget, Color.white);
+
+
+            if (IsOnNavMesh(transform.position))
+            {
+                //Log("✅ Recovered onto NavMesh.");
+                isInRecoveryMode = false;
+            }
+            else if (recoveryTimer > maxRecoveryTime)
+            {
+                //LogWarning("❌ Recovery failed, teleporting to last valid NavMesh position.");
+                transform.position = recoveryTarget;
+                isInRecoveryMode = false;
+            }
+        }
+        else
+        {
+            agentFollower.SetDestination(targetWaypoint.position);
+        }
+    }
+    private bool IsPositionSafeOnNavMesh(Vector3 position, float edgeThreshold = 0.5f)
+    {
+        if (NavMesh.SamplePosition(position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        {
+            if (NavMesh.FindClosestEdge(hit.position, out NavMeshHit edgeHit, NavMesh.AllAreas))
+            {
+                float distanceToEdge = Vector3.Distance(hit.position, edgeHit.position);
+                Debug.DrawLine(hit.position, edgeHit.position, new Color(1f, 0.5f, 0f)); // 🟠 Orange: Distance to edge
+
+                return distanceToEdge >= edgeThreshold;
+            }
+        }
+        return false; // Not on NavMesh or too close to edge
+    }
+    private bool PredictFutureTrajectoryOffNavMesh(Vector3 position, Vector3 direction, float speed, float steeringInput)
+    {
+        // Predict further at higher speeds (e.g., 1.5s at 30 speed → 3s at 60 speed)
+        float basePredictionTime = 1.5f;
+        float predictionDuration = basePredictionTime + (speed / 20f); // Scales with speed
+        int steps = 10;
+        float timeStep = predictionDuration / steps;
+
+        Vector3 simPos = position;
+        Vector3 simDir = direction.normalized;
+
+        for (int i = 0; i < steps; i++)
+        {
+            float turnAmount = steeringInput * AiMaxAngle;
+            simDir = Quaternion.Euler(0f, turnAmount * timeStep, 0f) * simDir;
+            simPos += simDir * speed * timeStep;
+
+            if (!IsPositionSafeOnNavMesh(simPos, 1f))
+            {
+                if (debugTrajectoryPrediction)
+                Debug.DrawRay(simPos, Vector3.up * 2f, Color.red, 1f); // 🔴 unsafe
+
+                return true;
+            }
+
+            if (debugTrajectoryPrediction)
+            Debug.DrawRay(simPos, Vector3.up * 2f, Color.green, 0.5f); // ✅ safe
+
+        }
+
+        return false;
+    }
     private bool IsOnNavMesh(Vector3 position, float maxDistance = 1.0f)
     {
         return NavMesh.SamplePosition(position, out _, maxDistance, NavMesh.AllAreas);
@@ -865,6 +902,8 @@ public class AICarController : MonoBehaviour
 
         return targetPosition;
     }
+    //=================================================================================================================================================================================================================================================
+    // Obstacle Detection
     bool DetectObstaclesAhead()
     {
         float speed = carController._rigidbody.linearVelocity.magnitude;
@@ -937,33 +976,47 @@ public class AICarController : MonoBehaviour
     Vector3 EvaluateOvertakeSide(Vector3 forward)
     {
         Vector3 offsetDir = Vector3.Cross(Vector3.up, forward).normalized;
-        float sideClearance = carWidth * 1.5f;
-        float forwardCheckDistance = 8f; // how far ahead to check from side position
+        float checkOffset = carWidth * 2f;
+        float clearanceThreshold = 2f;
+        float sideLength = 4f;
 
-        Vector3 leftPos = transform.position + offsetDir * sideClearance;
-        Vector3 rightPos = transform.position - offsetDir * sideClearance;
+        Vector3 leftOrigin = transform.position + offsetDir * checkOffset;
+        Vector3 rightOrigin = transform.position - offsetDir * checkOffset;
 
-        bool leftClear = !Physics.CheckBox(leftPos, new Vector3(carWidth * 0.5f, 1f, 3f), transform.rotation, carLayer | obstacleLayers);
-        bool rightClear = !Physics.CheckBox(rightPos, new Vector3(carWidth * 0.5f, 1f, 3f), transform.rotation, carLayer | obstacleLayers);
+        bool leftBlocked = Physics.CheckBox(leftOrigin, new Vector3(1f, 1f, sideLength), transform.rotation, obstacleLayers | carLayer);
+        bool rightBlocked = Physics.CheckBox(rightOrigin, new Vector3(1f, 1f, sideLength), transform.rotation, obstacleLayers | carLayer);
 
-        // Additional forward check from sides
-        bool leftAheadClear = !Physics.Raycast(leftPos + Vector3.up * 0.5f, forward, forwardCheckDistance, carLayer | obstacleLayers);
-        bool rightAheadClear = !Physics.Raycast(rightPos + Vector3.up * 0.5f, forward, forwardCheckDistance, carLayer | obstacleLayers);
-
-        if (debugObstacleDetection)
+        if (!leftBlocked && rightBlocked) return offsetDir * sideOffset;
+        if (leftBlocked && !rightBlocked) return -offsetDir * sideOffset;
+        if (!leftBlocked && !rightBlocked)
         {
-            Debug.DrawRay(leftPos + Vector3.up * 0.5f, forward * forwardCheckDistance, Color.blue);
-            Debug.DrawRay(rightPos + Vector3.up * 0.5f, forward * forwardCheckDistance, Color.blue);
+            // Go to wider side (measured by raycast)
+            float leftClear = Physics.Raycast(leftOrigin + Vector3.up, forward, out RaycastHit hitLeft, 8f, obstacleLayers | carLayer) ? hitLeft.distance : 8f;
+            float rightClear = Physics.Raycast(rightOrigin + Vector3.up, forward, out RaycastHit hitRight, 8f, obstacleLayers | carLayer) ? hitRight.distance : 8f;
+            return (leftClear > rightClear) ? offsetDir * sideOffset : -offsetDir * sideOffset;
         }
 
-        if (leftClear && leftAheadClear && !rightClear)
-            return offsetDir * sideOffset;
-        else if (!leftClear && rightClear && rightAheadClear)
-            return -offsetDir * sideOffset;
-        else if (leftClear && rightClear && leftAheadClear && rightAheadClear)
-            return (Random.value > 0.5f ? 1 : -1) * offsetDir * sideOffset;
-        else
-            return Vector3.zero; // neither side is safe
+        return Vector3.zero;
     }
-    
+
+    //=================================================================================================================================================================================================================================================
+    // Debugging
+    void DrawDebugLines()
+    {
+        if (debugWaypointPath)
+        {
+            Vector3 dir = (agentFollower.destination - transform.position).normalized;
+            Debug.DrawRay(transform.position, dir * 5f, Color.cyan);
+            Debug.DrawRay(transform.position, transform.forward * 5f, Color.yellow);
+        }
+
+        if (isTakingJokerLap && debugJokerLapPath)
+        {
+            Debug.DrawRay(
+                transform.position + Vector3.up * 1f,
+                (jokerWaypoints[jokerWaypointIndex].position - transform.position).normalized * 5f,
+                Color.magenta
+            );
+        }
+    }
 }

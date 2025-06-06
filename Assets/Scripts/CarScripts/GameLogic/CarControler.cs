@@ -398,19 +398,27 @@ public class CarController : MonoBehaviour
     }   
     void HandleWheelRolling()
     {
-        float speed = _rigidbody.linearVelocity.magnitude;
-        float wheelCircumference = 2f * Mathf.PI * wheelColliderFl.radius;
-        float rotationSpeed = (speed / wheelCircumference) * 360f * Time.fixedDeltaTime;
+        UpdateWheelPose(wheelColliderFl, wheelFl);
+        UpdateWheelPose(wheelColliderFr, wheelFr);
 
-        wheelFl.Rotate(Vector3.right, rotationSpeed);
-        wheelFr.Rotate(Vector3.right, rotationSpeed);
         if (!isHandbraking)
         {
-            wheelRl.Rotate(Vector3.right, rotationSpeed);
-            wheelRr.Rotate(Vector3.right, rotationSpeed);
+            UpdateWheelPose(wheelColliderRl, wheelRl);
+            UpdateWheelPose(wheelColliderRr, wheelRr);
         }
     }
-//=============================================================================================
+
+    void UpdateWheelPose(WheelCollider collider, Transform wheelTransform)
+    {
+        Vector3 position;
+        Quaternion rotation;
+        collider.GetWorldPose(out position, out rotation);
+
+        wheelTransform.position = position;
+        wheelTransform.rotation = rotation;
+    }
+
+    //=============================================================================================
     void SetupBrakeLights()
     {
         if (monoBrakeLight != null)
@@ -637,7 +645,18 @@ public class CarController : MonoBehaviour
             if (currentGear < carData.gearRatios.Length - 1) 
             {
                 currentGear++;
-                currentRPM *= 0.7f;
+                float newGearRatio = carData.gearRatios[currentGear];
+                float wheelRPM = Mathf.Abs((wheelColliderRr.rpm + wheelColliderRl.rpm) / 2f);
+
+                float targetRPM = Mathf.Clamp(
+                    wheelRPM * newGearRatio * carData.differentialRatio,
+                    carData.idleRPM,
+                    carData.redline
+                );
+
+                // Optional smoother blend if you simulate clutch
+                currentRPM = Mathf.Lerp(currentRPM, targetRPM, 0.8f); // can tweak 0.8f based on shift smoothness
+
                 lastShiftTime = Time.time;
                 if (debugManualGearShift)
                 {
@@ -663,7 +682,18 @@ public class CarController : MonoBehaviour
             if (currentGear > 0) 
             {
                 currentGear--;
-                currentRPM *= 0.7f;
+                float newGearRatio = carData.gearRatios[currentGear];
+                float wheelRPM = Mathf.Abs((wheelColliderRr.rpm + wheelColliderRl.rpm) / 2f);
+
+                float targetRPM = Mathf.Clamp(
+                    wheelRPM * newGearRatio * carData.differentialRatio,
+                    carData.idleRPM,
+                    carData.redline
+                );
+
+                // Optional smoother blend if you simulate clutch
+                currentRPM = Mathf.Lerp(currentRPM, targetRPM, 0.8f); // can tweak 0.8f based on shift smoothness
+
                 lastShiftTime = Time.time;
                 if (debugManualGearShift)
                 {
@@ -752,7 +782,18 @@ public class CarController : MonoBehaviour
         if (currentRPM >= carData.UpShiftRPM && currentGear < carData.gearRatios.Length - 1 && currentGear > 1)
         {
             currentGear++;
-            currentRPM *= 0.7f;
+            float newGearRatio = carData.gearRatios[currentGear];
+            float wheelRPM = Mathf.Abs((wheelColliderRr.rpm + wheelColliderRl.rpm) / 2f);
+
+            float targetRPM = Mathf.Clamp(
+                wheelRPM * newGearRatio * carData.differentialRatio,
+                carData.idleRPM,
+                carData.redline
+            );
+
+            // Optional smoother blend if you simulate clutch
+            currentRPM = Mathf.Lerp(currentRPM, targetRPM, 0.8f); // can tweak 0.8f based on shift smoothness
+
             lastShiftTime = Time.time;
             if(debugAutomaticGearShift)
             {
@@ -765,7 +806,18 @@ public class CarController : MonoBehaviour
         else if (currentRPM <= carData.DownShiftRPM && currentGear > 2) // Use DownShiftRPM for downshifting
         {
             currentGear--;
-            currentRPM *= 0.7f;
+            float newGearRatio = carData.gearRatios[currentGear];
+            float wheelRPM = Mathf.Abs((wheelColliderRr.rpm + wheelColliderRl.rpm) / 2f);
+
+            float targetRPM = Mathf.Clamp(
+                wheelRPM * newGearRatio * carData.differentialRatio,
+                carData.idleRPM,
+                carData.redline
+            );
+
+            // Optional smoother blend if you simulate clutch
+            currentRPM = Mathf.Lerp(currentRPM, targetRPM, 0.8f); // can tweak 0.8f based on shift smoothness
+
             lastShiftTime = Time.time;
             if(debugAutomaticGearShift)
             {
@@ -777,38 +829,39 @@ public class CarController : MonoBehaviour
     private float CalculateTorque()
     {
         float torque = 0f;
-        
+
         if (isEngineRunning)
         {
             int safeGearIndex = Mathf.Clamp(currentGear, 0, carData.gearRatios.Length - 1);
             float gearRatio = carData.gearRatios[safeGearIndex];
             float wheelRPM = Mathf.Abs((wheelColliderRr.rpm + wheelColliderRl.rpm) / 2f) * gearRatio * carData.differentialRatio;
 
+            // 🎯 Normalize torque based on first gear ratio
+            float firstGearRatio = carData.gearRatios[2]; // Assuming index 1 is 1st gear
+            float normalizedRatio = (gearRatio * carData.differentialRatio) / (firstGearRatio * carData.differentialRatio);
+            float gearTorqueFactor = Mathf.Clamp01(normalizedRatio); // Ensure it doesn't exceed 1
 
-            // 🎯 Base Torque Calculation
-            float baseTorque = carData.motorPower * gearRatio * carData.differentialRatio;
+            // 🔧 Use normalized factor to scale motor power
+            float baseTorque = carData.motorPower * gearTorqueFactor;
 
             // 🚀 Dynamic Acceleration Adjustment Based on Speed
-            float speedEffect = Mathf.Clamp01(_rigidbody.linearVelocity.magnitude / 50f); // 🔥 Adjusted scale factor
-            
+            float speedEffect = Mathf.Clamp01(_rigidbody.linearVelocity.magnitude / 50f);
+
             float accelerationMultiplier = Mathf.Lerp(
-                carData.lowSpeedAccelerationMultiplier, 
-                carData.highSpeedAccelerationMultiplier, 
+                carData.lowSpeedAccelerationMultiplier,
+                carData.highSpeedAccelerationMultiplier,
                 speedEffect
             );
 
-            baseTorque *= accelerationMultiplier;  // ✅ Apply the multiplier correctly
-            
+            baseTorque *= accelerationMultiplier;
+
             if (debugRPMandTorque)
             {
-                // ✅ DEBUG LOGS - Check Values in Console
                 Debug.Log($"Speed: {_rigidbody.linearVelocity.magnitude:F2}, SpeedEffect: {speedEffect:F2}");
-                Debug.Log($"Low Multiplier: {carData.lowSpeedAccelerationMultiplier}, High Multiplier: {carData.highSpeedAccelerationMultiplier}");
-                //Debug.Log($"Applied Acceleration Multiplier: {accelerationMultiplier:F2}");
+                Debug.Log($"Normalized Gear Torque Factor: {gearTorqueFactor:F2}");
                 Debug.Log($"Base Torque After Multiplier: {baseTorque:F2}");
-            
             }
-            
+
             // 🚨 Prevent Over-Revving
             if (currentRPM >= carData.redline && currentGear > 1)
             {
@@ -818,15 +871,15 @@ public class CarController : MonoBehaviour
             // 🏎️ Neutral Handling - Allow Free Revving
             if (currentGear == 1) // Neutral
             {
-                // Let RPM rise without applying torque to the wheels
                 float targetRPM = Mathf.Lerp(carData.idleRPM, carData.redline, gasInput);
                 currentRPM = Mathf.Lerp(currentRPM, targetRPM, Time.deltaTime * 5f);
-                return 0f; // No torque applied to wheels
+                return 0f;
             }
 
             // 📈 Rev Matching & Torque Clamping
             currentRPM = Mathf.Lerp(currentRPM, Mathf.Clamp(wheelRPM, carData.idleRPM, carData.redline), Time.deltaTime * 3f);
-            torque = Mathf.Clamp(baseTorque * gasInput, -carData.motorPower * 2f, carData.motorPower * 2f); // ✅ Use gasInput to scale final torque
+            torque = Mathf.Clamp(baseTorque * gasInput, -carData.motorPower * 2f, carData.motorPower * 2f);
+
             if (debugRPMandTorque)
             {
                 Debug.Log($"Final Torque Applied: {torque:F2}");
@@ -835,6 +888,7 @@ public class CarController : MonoBehaviour
 
         return torque;
     }
+
 //=============================================================================================
     void ApplyNaturalDeceleration()
     {
