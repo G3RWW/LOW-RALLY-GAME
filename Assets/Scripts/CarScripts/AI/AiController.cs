@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-
     public enum AIBehaviorType
     {
         Careful,
@@ -19,8 +18,6 @@ using System.Collections.Generic;
         Recovery
     }
 
-
-    
 public class AICarController : MonoBehaviour
 {
     [Header("Link to Car Controller")]
@@ -93,6 +90,21 @@ public class AICarController : MonoBehaviour
     [Header("Debugging")]
     private int lapCount = 0;
     private float lapTimer = 0f;
+    private void Log(string message)
+    {
+        Debug.Log($"[{gameObject.name}] {message}");
+    }
+
+    private void LogWarning(string message)
+    {
+        Debug.LogWarning($"[{gameObject.name}] {message}");
+    }
+
+    private void LogError(string message)
+    {
+        Debug.LogError($"[{gameObject.name}] {message}");
+    }
+
 
     [Header("Recovery Mode")]
     private bool isInRecoveryMode = false;
@@ -126,19 +138,19 @@ public class AICarController : MonoBehaviour
         // Use pre-assigned waypoints (from GameManager), fallback to container only if needed
         if ((waypoints == null || waypoints.Count == 0) && wayPointContainer != null)
         {
-            waypoints = wayPointContainer.waypoints;
-            Debug.LogWarning($"⚠️ {name} fallback: waypoints pulled from WayPointContainer.");
+            waypoints = wayPointContainer.waypoints.FindAll(wp => wp.CompareTag("Waypoint"));
+            LogWarning($"⚠️ {name} fallback: waypoints pulled from WayPointContainer.");
         }
 
         if ((jokerWaypoints == null || jokerWaypoints.Count == 0) && jokerLapWaypointContainer != null)
         {
             jokerWaypoints = jokerLapWaypointContainer.waypoints;
-            Debug.LogWarning($"⚠️ {name} fallback: joker waypoints pulled from JokerLapWaypointContainer.");
+            LogWarning($"⚠️ {name} fallback: joker waypoints pulled from JokerLapWaypointContainer.");
         }
 
         if (waypoints == null || waypoints.Count == 0)
         {
-            Debug.LogError($"❌ {name} has no waypoints assigned!");
+            LogError($"❌ {name} has no waypoints assigned!");
             return;
         }
 
@@ -186,7 +198,7 @@ public class AICarController : MonoBehaviour
             
         }
 
-        Debug.Log($"🚗 {name} AI initialized with {waypoints.Count} waypoints, behavior: {aiBehavior}");
+        Log($"🚗 {name} AI initialized with {waypoints.Count} waypoints, behavior: {aiBehavior}");
     }
     void Update()
     {
@@ -213,7 +225,7 @@ public class AICarController : MonoBehaviour
 
         //LateUpdateNavAgentSync();
 
-        Debug.Log($"AI State: {currentState}");
+        Log($"AI State: {currentState}");
 
     }
     void HandleIdleState()
@@ -322,7 +334,7 @@ public class AICarController : MonoBehaviour
                 carController.SetAISteering(0f);
                 carController.SetAIGas(0f);
                 carController.SetAIBrake(true);
-                Debug.LogWarning($"❌ Overtake path unsafe - braking");
+                LogWarning($"❌ Overtake path unsafe - braking");
                 return;
             }
 
@@ -382,7 +394,7 @@ public class AICarController : MonoBehaviour
         Transform target = currentPath[index];
         if (!target)
         {
-            Debug.LogWarning($"❌ Missing waypoint {index}.");
+            LogWarning($"❌ Missing waypoint {index}.");
             if (isTakingJokerLap) jokerWaypointIndex++;
             else NextWaypoint();
         }
@@ -400,7 +412,7 @@ public class AICarController : MonoBehaviour
                 if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 10f, NavMesh.AllAreas))
                 {
                     recoveryTarget = hit.position;
-                    //Debug.Log($"🔁 Off NavMesh - entering recovery mode to {recoveryTarget}");
+                    //Log($"🔁 Off NavMesh - entering recovery mode to {recoveryTarget}");
                 }
             }
         }
@@ -416,12 +428,12 @@ public class AICarController : MonoBehaviour
 
             if (IsOnNavMesh(transform.position))
             {
-                //Debug.Log("✅ Recovered onto NavMesh.");
+                //Log("✅ Recovered onto NavMesh.");
                 isInRecoveryMode = false;
             }
             else if (recoveryTimer > maxRecoveryTime)
             {
-                //Debug.LogWarning("❌ Recovery failed, teleporting to last valid NavMesh position.");
+                //LogWarning("❌ Recovery failed, teleporting to last valid NavMesh position.");
                 transform.position = recoveryTarget;
                 isInRecoveryMode = false;
             }
@@ -548,13 +560,13 @@ public class AICarController : MonoBehaviour
             currentWaypointIndex = 1; // Skip index 0 to avoid instant lap spam
             lapCount++;
 
-            Debug.Log($"🏁 {name} finished lap {lapCount}");
+            Log($"🏁 {name} finished lap {lapCount}");
 
             if (!hasTakenJokerLap)
             {
                 float chance = 0.4f;
                 shouldTakeJokerLap = Random.value < chance;
-                Debug.Log(shouldTakeJokerLap ? $"🃏 {name} will take Joker Lap!" : $"➡️ {name} will skip Joker Lap.");
+                Log(shouldTakeJokerLap ? $"🃏 {name} will take Joker Lap!" : $"➡️ {name} will skip Joker Lap.");
             }
         }
     }
@@ -563,7 +575,7 @@ public class AICarController : MonoBehaviour
         jokerWaypointIndex++;
         if (jokerWaypointIndex >= jokerWaypoints.Count)
         {
-            Debug.Log("🃏 Joker Lap path complete → reconnecting to normal path at specific rejoin point");
+            Log("🃏 Joker Lap path complete → reconnecting to normal path at specific rejoin point");
 
             isTakingJokerLap = false;
             hasTakenJokerLap = true;
@@ -573,11 +585,11 @@ public class AICarController : MonoBehaviour
             if (jokerLapExitRejoinPoint != null && waypoints.Contains(jokerLapExitRejoinPoint))
             {
                 currentWaypointIndex = waypoints.IndexOf(jokerLapExitRejoinPoint);
-                Debug.Log($"🔁 Reconnected to normal path at WP {currentWaypointIndex} ({jokerLapExitRejoinPoint.name})");
+                Log($"🔁 Reconnected to normal path at WP {currentWaypointIndex} ({jokerLapExitRejoinPoint.name})");
             }
             else
             {
-                Debug.LogWarning("⚠️ JokerLapExitRejoinPoint is not assigned or not found in waypoints list! Falling back.");
+                LogWarning("⚠️ JokerLapExitRejoinPoint is not assigned or not found in waypoints list! Falling back.");
                 currentWaypointIndex = Mathf.Max(waypoints.Count - 2, 0);
             }
 
@@ -634,7 +646,7 @@ public class AICarController : MonoBehaviour
         // Prediction fallback
         if (PredictFutureTrajectoryOffNavMesh(transform.position, transform.forward, speed, smoothSteering))
         {
-            Debug.LogWarning("⚠️ Predictive: braking for safety!");
+            LogWarning("⚠️ Predictive: braking for safety!");
             brakeStrength = Mathf.Max(brakeStrength, 0.7f);
         }
 
@@ -712,7 +724,7 @@ public class AICarController : MonoBehaviour
             targetSpeed = maxStraightSpeed; // Almost straight
         if(debugSpeedAdjustment)
         {
-            Debug.Log($"🌀 Adjusting AI Speed: {targetSpeed:F2} for turn angle: {nextAngle:F2}°");
+            Log($"🌀 Adjusting AI Speed: {targetSpeed:F2} for turn angle: {nextAngle:F2}°");
 
         }
     }
@@ -731,7 +743,7 @@ public class AICarController : MonoBehaviour
         {
             if (shouldTakeJokerLap && !hasTakenJokerLap)
             {
-                Debug.Log("🃏 Joker Lap triggered. Entering Joker Lap path!");
+                Log("🃏 Joker Lap triggered. Entering Joker Lap path!");
                 isTakingJokerLap = true;
                 jokerWaypointIndex = 0;
                 jokerLapStage = JokerLapStage.TakingJokerLap;
@@ -740,7 +752,7 @@ public class AICarController : MonoBehaviour
             }
             else
             {
-                Debug.Log("⏩ Joker Lap trigger entered, but skipping (already taken or not this lap).");
+                Log("⏩ Joker Lap trigger entered, but skipping (already taken or not this lap).");
             }
             return;
         }
@@ -752,12 +764,12 @@ public class AICarController : MonoBehaviour
             Transform expected = waypoints[currentWaypointIndex];
             if (other.transform == expected)
             {
-                Debug.Log($"✅ Reached expected Waypoint {currentWaypointIndex}");
+                Log($"✅ Reached expected Waypoint {currentWaypointIndex}");
                 NextWaypoint();
             }
             else
             {
-                Debug.LogWarning($"❌ Wrong waypoint entered. Expected: {expected.name}, got: {other.transform.name}");
+                LogWarning($"❌ Wrong waypoint entered. Expected: {expected.name}, got: {other.transform.name}");
             }
         }
 
@@ -768,12 +780,12 @@ public class AICarController : MonoBehaviour
             Transform expectedJoker = jokerWaypoints[jokerWaypointIndex];
             if (other.transform == expectedJoker)
             {
-                Debug.Log($"🎯 Reached Joker Waypoint {jokerWaypointIndex}");
+                Log($"🎯 Reached Joker Waypoint {jokerWaypointIndex}");
                 NextJokerWaypoint();
             }
             else
             {
-                Debug.LogWarning($"❌ Wrong Joker Waypoint entered. Expected: {expectedJoker.name}, got: {other.transform.name}");
+                LogWarning($"❌ Wrong Joker Waypoint entered. Expected: {expectedJoker.name}, got: {other.transform.name}");
             }
         }
 
@@ -783,7 +795,7 @@ public class AICarController : MonoBehaviour
         {
             lapCount++;
 
-            Debug.Log($"🏁 Joker Lap completed at exit! Lap {lapCount} counted.");
+            Log($"🏁 Joker Lap completed at exit! Lap {lapCount} counted.");
             return;
         }
 
@@ -953,5 +965,5 @@ public class AICarController : MonoBehaviour
         else
             return Vector3.zero; // neither side is safe
     }
-
+    
 }
