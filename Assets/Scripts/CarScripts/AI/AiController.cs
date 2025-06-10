@@ -120,6 +120,7 @@ public class AICarController : MonoBehaviour
     [SerializeField] private bool debugDrawStraightLine = false;
     [SerializeField] private bool debugDrawBezierCurve = false;
     private AIState currentState = AIState.Idle;
+    public float currentSpeedKmh;
     //=================================================================================================================================================================================================================================================
     // Initialization
     void Start()
@@ -199,6 +200,8 @@ public class AICarController : MonoBehaviour
     }
     void Update()
     {
+        currentSpeedKmh = carController != null ? carController._rigidbody.linearVelocity.magnitude * 3.6f : 0f;
+
         lapTimer += Time.deltaTime;
 
         switch (currentState)
@@ -238,11 +241,13 @@ public class AICarController : MonoBehaviour
     void HandleIdleState()
     {
         /*
-        if (IsOnNavMesh(transform.position))
+         if (IsOnNavMesh(transform.position))
         {
             currentState = AIState.Driving;
         }
+        
         */
+       
     }
     void HandleDrivingState()
     {
@@ -602,57 +607,48 @@ public class AICarController : MonoBehaviour
     }
     void CheckProximityToWaypoint()
     {
-        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
+        var currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
         int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
-
         if (index >= currentPath.Count) return;
 
-        Transform wp = currentPath[index];
-        float distance = Vector3.Distance(transform.position, wp.position);
+        var wp = currentPath[index];
+        float dist = Vector3.Distance(transform.position, wp.position);
 
-        // NEW: Check if it's behind the car
-        Vector3 toWaypoint = (wp.position - transform.position).normalized;
-        float forwardDot = Vector3.Dot(transform.forward, toWaypoint); // forward = 1, behind = -1
-
-        bool isBehind = forwardDot < 0f;
-        bool isCloseEnough = distance < waypointRange;
-
-        if (isCloseEnough || isBehind)
+        // If AI is within range or passed the waypoint
+        if (dist < waypointRange || Vector3.Dot((wp.position - transform.position).normalized, transform.forward) < 0f)
         {
             if (isTakingJokerLap)
             {
-                // ONLY continue if this is the current expected Joker waypoint
-                if (wp == jokerWaypoints[jokerWaypointIndex])
-                    NextJokerWaypoint();
-                    lastValidWaypointIndex = currentWaypointIndex;
+                lastValidWaypointIndex = jokerWaypointIndex;
+                NextJokerWaypoint();
             }
             else
             {
-                if (visitedWaypoints.Contains(wp)) return;
-
-                // ONLY continue if this is the current expected waypoint
-                if (wp == waypoints[currentWaypointIndex])
-                    NextWaypoint();
-                    lastValidWaypointIndex = currentWaypointIndex;
+                lastValidWaypointIndex = currentWaypointIndex;
+                NextWaypoint();
             }
         }
     }
+
     void NextWaypoint()
     {
         currentWaypointIndex++;
 
         if (currentWaypointIndex >= waypoints.Count)
         {
-            currentWaypointIndex = 1; // Skip index 0 to avoid instant lap spam
+            // new lap: skip 0, reset visits
+            currentWaypointIndex = 1;
             lapCount++;
-
+            visitedWaypoints.Clear();            // ← clear so you can visit all again
             Log($"🏁 {name} finished lap {lapCount}");
 
             if (!hasTakenJokerLap)
             {
                 float chance = 0.4f;
                 shouldTakeJokerLap = Random.value < chance;
-                Log(shouldTakeJokerLap ? $"🃏 {name} will take Joker Lap!" : $"➡️ {name} will skip Joker Lap.");
+                Log( shouldTakeJokerLap 
+                    ? $"🃏 {name} will take Joker Lap!" 
+                    : $"➡️ {name} will skip Joker Lap." );
             }
         }
     }
@@ -694,58 +690,41 @@ public class AICarController : MonoBehaviour
                 jokerWaypointIndex = 0;
                 jokerLapStage = JokerLapStage.TakingJokerLap;
                 shouldTakeJokerLap = false;
-                // We'll mark hasTakenJokerLap after completing all joker waypoints
             }
             else
             {
-                Log("⏩ Joker Lap trigger entered, but skipping (already taken or not this lap).");
+                Log("⏩ Joker Lap trigger entered, but skipping.");
             }
             return;
         }
 
-
-        // Regular waypoint trigger
+        // Just log regular waypoints — no progression here!
         if (!isTakingJokerLap && currentWaypointIndex < waypoints.Count)
         {
             Transform expected = waypoints[currentWaypointIndex];
             if (other.transform == expected)
-            {
-                Log($"✅ Reached expected Waypoint {currentWaypointIndex}");
-                NextWaypoint();
-            }
+                Log($"✅ Entered Waypoint {currentWaypointIndex}");
             else
-            {
-                LogWarning($"❌ Wrong waypoint entered. Expected: {expected.name}, got: {other.transform.name}");
-            }
+                LogWarning($"❌ Wrong WP: Expected {expected.name}, got {other.transform.name}");
         }
 
-
-        // Joker Lap waypoint trigger
-        else if (isTakingJokerLap && jokerWaypointIndex < jokerWaypoints.Count)
+        if (isTakingJokerLap && jokerWaypointIndex < jokerWaypoints.Count)
         {
             Transform expectedJoker = jokerWaypoints[jokerWaypointIndex];
             if (other.transform == expectedJoker)
-            {
-                Log($"🎯 Reached Joker Waypoint {jokerWaypointIndex}");
-                NextJokerWaypoint();
-            }
+                Log($"🎯 Entered Joker WP {jokerWaypointIndex}");
             else
-            {
-                LogWarning($"❌ Wrong Joker Waypoint entered. Expected: {expectedJoker.name}, got: {other.transform.name}");
-            }
+                LogWarning($"❌ Wrong Joker WP: Expected {expectedJoker.name}, got {other.transform.name}");
         }
 
-
-        // Joker Lap Exit Trigger
+        // Joker exit logic
         if (other.transform == jokerLapExitPoint && !hasTakenJokerLap)
         {
             lapCount++;
-
-            Log($"🏁 Joker Lap completed at exit! Lap {lapCount} counted.");
-            return;
+            Log($"🏁 Joker Lap completed! Lap {lapCount}");
         }
-
     }
+
     Transform FindClosestJokerLapEntry()
     {
         float minDist = Mathf.Infinity;
@@ -977,7 +956,6 @@ public class AICarController : MonoBehaviour
     {
         Vector3 offsetDir = Vector3.Cross(Vector3.up, forward).normalized;
         float checkOffset = carWidth * 2f;
-        float clearanceThreshold = 2f;
         float sideLength = 4f;
 
         Vector3 leftOrigin = transform.position + offsetDir * checkOffset;

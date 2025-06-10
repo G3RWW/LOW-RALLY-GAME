@@ -37,6 +37,9 @@ public class PauseManager : MonoBehaviour
     {
         pauseMenuUI.SetActive(false);
         settingsUI.SetActive(true);
+        Time.timeScale = 0f;
+        isPaused = true;
+        FMODAudioManager.Instance.SetEngineMuted(true);
     }
 
     public void RestartScene()

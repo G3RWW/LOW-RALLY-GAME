@@ -23,25 +23,33 @@ public class GearboxSettingsManager : MonoBehaviour
     {
         UseManual = value;
         PlayerPrefs.SetInt("useManual", value ? 1 : 0);
+        PlayerPrefs.Save();
 
-        // 🔥 Update the player's gearbox mode immediately
+        // Try to apply immediately to existing playerCar (if in menu scene)
         var playerCar = GameObject.FindGameObjectWithTag("playerCar");
         if (playerCar != null)
         {
-            var controller = playerCar.GetComponent<CarController>();
-            if (controller != null)
-            {
-                controller.isAutomatic = !value;
-                Debug.Log($"⚙️ Gearbox mode updated: {(value ? "Manual" : "Automatic")}");
-            }
-            else
-            {
-                Debug.LogWarning("🚫 CarController not found on playerCar.");
-            }
+            ApplyGearboxTo(playerCar);
+        }
+    }
+
+    public void ApplyGearboxTo(GameObject car)
+    {
+        if (car == null)
+        {
+            Debug.LogWarning("🚫 ApplyGearboxTo: car is null.");
+            return;
+        }
+
+        var controller = car.GetComponent<CarController>();
+        if (controller != null)
+        {
+            controller.isAutomatic = !UseManual;
+            Debug.Log($"⚙️ Gearbox mode applied: {(UseManual ? "Manual" : "Automatic")}");
         }
         else
         {
-            Debug.LogWarning("🚫 playerCar GameObject not found.");
+            Debug.LogWarning("🚫 CarController not found on car.");
         }
     }
 

@@ -1,8 +1,6 @@
 using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
-
-[RequireComponent(typeof(Rigidbody))]
 public class EngineSoundFMOD : MonoBehaviour
 {
     [Header("FMOD Settings")]
@@ -33,7 +31,7 @@ public class EngineSoundFMOD : MonoBehaviour
         if (!engineEvent.IsNull)
         {
             engineInstance = RuntimeManager.CreateInstance(engineEvent);
-            RuntimeManager.AttachInstanceToGameObject(engineInstance, transform, GetComponent<Rigidbody>());
+            RuntimeManager.AttachInstanceToGameObject(engineInstance, car.transform, car._rigidbody);
             engineInstance.start();
             instanceIsValid = true;
         }
@@ -55,7 +53,12 @@ public class EngineSoundFMOD : MonoBehaviour
         {
             engineInstance.setVolume(FMODAudioManager.Instance.engineVolume);
         }
+
+        // 🔁 Update FMOD instance position (prevents falling below map)
+        RuntimeManager.AttachInstanceToGameObject(engineInstance, car.transform, car._rigidbody);
+
     }
+
 
     void OnDestroy()
     {

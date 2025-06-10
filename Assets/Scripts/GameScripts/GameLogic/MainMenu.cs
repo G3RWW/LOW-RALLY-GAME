@@ -8,6 +8,8 @@ public class MenuManager : MonoBehaviour
     public GameObject selectMode;
     public GameObject selectCar;
     public GameObject selectMap;
+    public GameObject controlsPanel;
+
 
     public void ShowMainMenu()
     {
@@ -39,6 +41,13 @@ public class MenuManager : MonoBehaviour
         selectMap.SetActive(true);
     }
 
+        public void ShowControlsPanel()
+    {
+        HideAll();
+        controlsPanel.SetActive(true);
+    }
+
+
     public void SelectCar(string carName)
     {
         PlayerSelection.selectedCarName = carName;
@@ -63,5 +72,6 @@ public class MenuManager : MonoBehaviour
         selectCar.SetActive(false);
         selectMap.SetActive(false);
         settingsMenu.SetActive(false);
+        controlsPanel.SetActive(false);
     }
 }

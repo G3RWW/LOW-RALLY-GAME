@@ -311,7 +311,7 @@ MonoBehaviour:
   - {fileID: -6291243791028858724}
   StringsBanks:
   - {fileID: -7152757348224058554}
-  cacheTime: 638851584550689570
+  cacheTime: 638851673008780535
   cacheVersion: 131624
 --- !u!114 &889991593548354274
 MonoBehaviour:
@@ -443,12 +443,12 @@ MonoBehaviour:
   Banks:
   - {fileID: 8640080790614153754}
   IsStream: 0
-  Is3D: 0
+  Is3D: 1
   IsOneShot: 0
   Parameters:
   - {fileID: -6111932089527203584}
   MinDistance: 1
-  MaxDistance: 20
+  MaxDistance: 50
   Length: 0
 --- !u!114 &6379613992396664732
 MonoBehaviour:
@@ -546,10 +546,10 @@ MonoBehaviour:
   Path: Assets/StreamingAssets/TEST/Build/Desktop/Engine.bank
   Name: Engine
   StudioPath: bank:/Engine
-  lastModified: 638847349845846442
+  lastModified: 638851673008780535
   FileSizes:
   - Name: Desktop
-    Value: 902240
+    Value: 902528
   Exists: 1
 --- !u!114 &8811783834283822968
 MonoBehaviour:
@@ -590,7 +590,7 @@ MonoBehaviour:
   Path: Assets/StreamingAssets/TEST/Build/Desktop/Music.bank
   Name: Music
   StudioPath: bank:/Music
-  lastModified: 638851584550689570
+  lastModified: 638851593012457073
   FileSizes:
   - Name: Desktop
     Value: 28095584

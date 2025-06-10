@@ -5,7 +5,7 @@
 			<value>86_BOXER_ENGINE</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a5dacdea-a529-4158-a567-4abcfdb35b25}</destination>
@@ -59,7 +59,11 @@
 			<destination>{32e2fd1b-8f23-432d-b959-c228de1453e1}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{d8dfe93e-2073-40d1-9e96-5715ad58ea1b}" />
+	<object class="EventAutomatableProperties" id="{d8dfe93e-2073-40d1-9e96-5715ad58ea1b}">
+		<property name="maximumDistance">
+			<value>50</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{9d5fdf95-141e-419a-940f-1ea12dff3f73}" />
 	<object class="GroupTrack" id="{a8681e55-0a6d-4a29-8253-618db5a05b73}">
 		<relationship name="modules">
@@ -502,6 +506,7 @@
 	<object class="MixerBusEffectChain" id="{8fc5984e-bf90-49af-994f-160612a58ca0}">
 		<relationship name="effects">
 			<destination>{b04a1ed2-b89d-462c-b104-d2ac8be16df4}</destination>
+			<destination>{137fb1d8-f8bb-43d1-a745-5ed79f420cb7}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{341130c3-fb84-4d35-a603-51676e1c71e6}" />
@@ -861,6 +866,7 @@
 	</object>
 	<object class="MixerBusPanner" id="{154c8fcb-773c-4f52-8f42-4d8f694e929c}" />
 	<object class="MixerBusFader" id="{b04a1ed2-b89d-462c-b104-d2ac8be16df4}" />
+	<object class="SpatialiserEffect" id="{137fb1d8-f8bb-43d1-a745-5ed79f420cb7}" />
 	<object class="AutomationPoint" id="{197555ab-9677-4932-a8ed-7a4dc038707a}">
 		<property name="position">
 			<value>925</value>

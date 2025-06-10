@@ -22,6 +22,8 @@ public class FMODAudioManager : MonoBehaviour
         Debug.Log($"Master Bus Valid: {masterBus.isValid()}");
         Debug.Log($"Engine Bus Valid: {engineBus.isValid()}");
         Debug.Log($"Music Bus Valid: {musicBus.isValid()}");
+
+        ApplyAllSettings();
     }
 
     private void Awake()
@@ -36,7 +38,6 @@ public class FMODAudioManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         LoadSettings();
-        ApplyAllSettings();
     }
 
     public void SetMasterVolume(float value)

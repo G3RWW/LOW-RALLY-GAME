@@ -9,9 +9,10 @@ public class FMODMusicShuffler : MonoBehaviour
 
     [Header("FMOD Music Tracks")]
     public List<EventReference> musicTracks;
-
     private Queue<EventReference> shuffleQueue = new Queue<EventReference>();
+    private Stack<EventReference> playedHistory = new Stack<EventReference>();
     private EventInstance currentInstance;
+    private EventReference currentTrack;
     private bool isPlaying = false;
 
     void Awake()
@@ -38,6 +39,16 @@ public class FMODMusicShuffler : MonoBehaviour
         {
             PlayNextTrack();
         }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            PlayNextTrack(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            PlayPreviousTrack();
+        }
     }
 
     void PrepareShuffleQueue()
@@ -52,25 +63,51 @@ public class FMODMusicShuffler : MonoBehaviour
         shuffleQueue = new Queue<EventReference>(shuffled);
     }
 
-    void PlayNextTrack()
+    void PlayNextTrack(bool manualSkip = false)
     {
+        if (manualSkip && !currentTrack.IsNull)
+        {
+            playedHistory.Push(currentTrack);
+        }
+
         if (shuffleQueue.Count == 0)
             PrepareShuffleQueue();
 
-        EventReference nextTrack = shuffleQueue.Dequeue();
+        StopMusic();
 
-        if (nextTrack.IsNull)
+        currentTrack = shuffleQueue.Dequeue();
+
+        if (currentTrack.IsNull)
         {
             Debug.LogWarning("FMODMusicShuffler: Encountered null track. Skipping.");
             return;
         }
 
-        currentInstance = RuntimeManager.CreateInstance(nextTrack);
+        currentInstance = RuntimeManager.CreateInstance(currentTrack);
         currentInstance.start();
-        currentInstance.release(); // Let FMOD clean up
+        currentInstance.release();
         isPlaying = true;
 
-        Debug.Log($"🎵 Now playing: {nextTrack.Path}");
+        Debug.Log($"🎵 Now playing: {currentTrack.Path}");
+    }
+
+    void PlayPreviousTrack()
+    {
+        if (playedHistory.Count == 0)
+        {
+            Debug.Log("FMODMusicShuffler: No previous track.");
+            return;
+        }
+
+        StopMusic();
+
+        currentTrack = playedHistory.Pop();
+        currentInstance = RuntimeManager.CreateInstance(currentTrack);
+        currentInstance.start();
+        currentInstance.release();
+        isPlaying = true;
+
+        Debug.Log($"⏪ Now playing: {currentTrack.Path}");
     }
 
     public void StopMusic()
