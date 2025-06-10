@@ -12,20 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452035a65beda0c4ba903340a7c0b2a7, type: 3}
   m_Name: VW_POLO
   m_EditorClassIdentifier: 
-  maxSteerAngle: 55
-  motorPower: 600
-  brakeTorque: 1500
+  maxSteerAngle: 30
+  motorPower: 300
+  brakeTorque: 1800
   handbrakeTorque: 3000
   rollingResistance: 0.1
   engineBraking: 50
-  isAutomatic: 1
-  isClutchAuto: 1
   idleRPM: 900
   UpShiftRPM: 6000
   DownShiftRPM: 2500
-  differentialRatio: 3.5
+  differentialRatio: 4.1
   redline: 7000
-  gearRatioMultiplier: 4.29
+  finalDriveRatio: 1
   hpToRPMCurve:
     serializedVersion: 2
     m_Curve:
@@ -52,14 +50,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   gearRatios:
   - 3.5
+  - 0
+  - 3.6
   - 2.1
-  - 1.4
+  - 1.5
+  - 1.2
   - 1
-  - 0.8
   - 0.7
-  - 0.6
-  forwardFrictionStiffness: 1.2
-  sidewaysFrictionStiffness: 0.8
+  forwardFrictionStiffness: 1
+  sidewaysFrictionStiffness: 0.4
   drivetrain: 0
   steeringSensitivityCurve:
     serializedVersion: 2
@@ -121,7 +120,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  driftSteerAssist: 0.5
+  driftSteerAssist: 5
   gripReductionFactor: 0.6
-  lowSpeedAccelerationMultiplier: 1.5
-  highSpeedAccelerationMultiplier: 1
+  lowSpeedAccelerationMultiplier: 2.5
+  highSpeedAccelerationMultiplier: 0.4
