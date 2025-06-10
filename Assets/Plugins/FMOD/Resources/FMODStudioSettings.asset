@@ -463,8 +463,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: ../../AUDIO-FILES/fuckmode/TEST/TEST.fspro
-  sourceBankPath: ../../AUDIO-FILES/fuckmode/TEST/Build
+  sourceProjectPath: Assets/StreamingAssets/TEST/TEST.fspro
+  sourceBankPath: Assets/StreamingAssets/TEST/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
