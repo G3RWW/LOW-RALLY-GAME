@@ -19,7 +19,7 @@ MonoBehaviour:
     Data3: 1773421715
     Data4: -864095535
   Banks:
-  - {fileID: -2693592098350165828}
+  - {fileID: 8843807674904222676}
   IsStream: 1
   Is3D: 0
   IsOneShot: 1
@@ -27,6 +27,26 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 176901
+--- !u!114 &-7152757348224058554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: Assets/StreamingAssets/TEST/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 638851583232296713
+  FileSizes:
+  - Name: Desktop
+    Value: 1500
+  Exists: 1
 --- !u!114 &-6992636731516093540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46,7 +66,7 @@ MonoBehaviour:
     Data3: 863545248
     Data4: 107303725
   Banks:
-  - {fileID: -2693592098350165828}
+  - {fileID: 8843807674904222676}
   IsStream: 1
   Is3D: 0
   IsOneShot: 1
@@ -54,6 +74,26 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 194115
+--- !u!114 &-6291243791028858724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: Assets/StreamingAssets/TEST/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638851583232276661
+  FileSizes:
+  - Name: Desktop
+    Value: 1340
+  Exists: 1
 --- !u!114 &-6111932089527203584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,7 +185,7 @@ MonoBehaviour:
   - Name: Desktop
     Value: 1452
   Exists: 1
---- !u!114 &-2693592098350165828
+--- !u!114 &-3075579649657647966
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,17 +194,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Music.bank
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Leslie Parrish - Remember Me
   m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Music.bank
-  Name: Music
-  StudioPath: bank:/Music
-  lastModified: 638847351962749493
-  FileSizes:
-  - Name: Desktop
-    Value: 7465856
-  Exists: 1
+  Path: event:/Leslie Parrish - Remember Me
+  Guid:
+    Data1: -1072180803
+    Data2: 1165914268
+    Data3: -2090772051
+    Data4: 2040998330
+  Banks:
+  - {fileID: 8843807674904222676}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 284525
+--- !u!114 &-2809687966399575149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/JAGER - I won't fall apart
+  m_EditorClassIdentifier: 
+  Path: event:/JAGER - I won't fall apart
+  Guid:
+    Data1: -548726788
+    Data2: 1104136176
+    Data3: -1381098852
+    Data4: 1626946119
+  Banks:
+  - {fileID: 8843807674904222676}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 257332
 --- !u!114 &-2530473241428963955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,46 +279,6 @@ MonoBehaviour:
   - Name: Desktop
     Value: 1286
   Exists: 1
---- !u!114 &-1384444972852888747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Engine.bank
-  m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Engine.bank
-  Name: Engine
-  StudioPath: bank:/Engine
-  lastModified: 638847349845846442
-  FileSizes:
-  - Name: Desktop
-    Value: 902240
-  Exists: 1
---- !u!114 &-695068455759427404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.strings.bank
-  m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Master.strings.bank
-  Name: Master.strings
-  StudioPath: bank:/Master.strings
-  lastModified: 638847349842257205
-  FileSizes:
-  - Name: Desktop
-    Value: 1180
-  Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,21 +292,26 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: -695068455759427404}
-  - {fileID: 7222253340187677654}
-  - {fileID: -2693592098350165828}
-  - {fileID: -1384444972852888747}
+  - {fileID: -7152757348224058554}
+  - {fileID: 8640080790614153754}
+  - {fileID: -6291243791028858724}
+  - {fileID: 8843807674904222676}
   EditorEvents:
   - {fileID: -6992636731516093540}
   - {fileID: 6449231721841021490}
   - {fileID: -9073569490565113304}
   - {fileID: 6065389681282786403}
+  - {fileID: 1534193805146405568}
+  - {fileID: 6379613992396664732}
+  - {fileID: -3075579649657647966}
+  - {fileID: 5557485089964245043}
+  - {fileID: -2809687966399575149}
   EditorParameters: []
   MasterBanks:
-  - {fileID: 7222253340187677654}
+  - {fileID: -6291243791028858724}
   StringsBanks:
-  - {fileID: -695068455759427404}
-  cacheTime: 638847351962749493
+  - {fileID: -7152757348224058554}
+  cacheTime: 638851584550689570
   cacheVersion: 131624
 --- !u!114 &889991593548354274
 MonoBehaviour:
@@ -301,6 +340,60 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 192000
+--- !u!114 &1534193805146405568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Leslie Parrish - Killing my Love
+  m_EditorClassIdentifier: 
+  Path: event:/Leslie Parrish - Killing my Love
+  Guid:
+    Data1: -1059728092
+    Data2: 1163714192
+    Data3: 560357045
+    Data4: 327340785
+  Banks:
+  - {fileID: 8843807674904222676}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 380473
+--- !u!114 &5557485089964245043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/LOU GRANT  -DON'T STOP THE MUSIC
+  m_EditorClassIdentifier: 
+  Path: event:/LOU GRANT  -DON'T STOP THE MUSIC
+  Guid:
+    Data1: 43766259
+    Data2: 1116433589
+    Data3: -620889173
+    Data4: 356991283
+  Banks:
+  - {fileID: 8843807674904222676}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 297404
 --- !u!114 &5939768220175620792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,7 +441,7 @@ MonoBehaviour:
     Data3: -2016605557
     Data4: 971120645
   Banks:
-  - {fileID: -1384444972852888747}
+  - {fileID: 8640080790614153754}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -357,6 +450,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &6379613992396664732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Max Coveri - Running in the 90s
+  m_EditorClassIdentifier: 
+  Path: event:/Max Coveri - Running in the 90s
+  Guid:
+    Data1: 1133793108
+    Data2: 1092100648
+    Data3: -2021939283
+    Data4: 948987107
+  Banks:
+  - {fileID: 8843807674904222676}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 285074
 --- !u!114 &6449231721841021490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,7 +496,7 @@ MonoBehaviour:
     Data3: -1615749458
     Data4: 674156514
   Banks:
-  - {fileID: -2693592098350165828}
+  - {fileID: 8843807674904222676}
   IsStream: 1
   Is3D: 0
   IsOneShot: 1
@@ -411,7 +531,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 187600
---- !u!114 &7222253340187677654
+--- !u!114 &8640080790614153754
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -421,15 +541,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
+  m_Name: bank:/Engine.bank
   m_EditorClassIdentifier: 
-  Path: ../../AUDIO-FILES/fuckmode/TEST/Build/Desktop/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 638847349842242164
+  Path: Assets/StreamingAssets/TEST/Build/Desktop/Engine.bank
+  Name: Engine
+  StudioPath: bank:/Engine
+  lastModified: 638847349845846442
   FileSizes:
   - Name: Desktop
-    Value: 1340
+    Value: 902240
   Exists: 1
 --- !u!114 &8811783834283822968
 MonoBehaviour:
@@ -454,4 +574,24 @@ MonoBehaviour:
   Type: 0
   IsGlobal: 0
   Labels: []
+  Exists: 1
+--- !u!114 &8843807674904222676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Music.bank
+  m_EditorClassIdentifier: 
+  Path: Assets/StreamingAssets/TEST/Build/Desktop/Music.bank
+  Name: Music
+  StudioPath: bank:/Music
+  lastModified: 638851584550689570
+  FileSizes:
+  - Name: Desktop
+    Value: 28095584
   Exists: 1
