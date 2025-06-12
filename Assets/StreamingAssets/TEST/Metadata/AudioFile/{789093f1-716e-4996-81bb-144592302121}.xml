@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{789093f1-716e-4996-81bb-144592302121}">
 		<property name="assetPath">
-			<value>Mindslip - Broken Picture Frames .mp3</value>
+			<value>MUSIC/Mindslip - Broken Picture Frames .mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>

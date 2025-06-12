@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{53fa4fae-61e1-47c9-a8a0-30af472c132e}">
+		<property name="assetPath">
+			<value>911_GTR/6k.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>7.0980498866213155</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{93986776-afe8-4365-8a27-697975e55a6f}</destination>
+		</relationship>
+	</object>
+</objects>

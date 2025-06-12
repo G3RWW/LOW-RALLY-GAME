@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{4bf38566-72c2-47b2-9823-383a457d60bb}">
 		<property name="assetPath">
-			<value>LOU GRANT  -DON'T STOP THE MUSIC .mp3</value>
+			<value>MUSIC/LOU GRANT  -DON'T STOP THE MUSIC .mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{b523ba35-8149-4d03-a970-1a11e60b861f}">
+		<property name="assetPath">
+			<value>POLO/1k.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>6.5552834467120178</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{93986776-afe8-4365-8a27-697975e55a6f}</destination>
+		</relationship>
+	</object>
+</objects>

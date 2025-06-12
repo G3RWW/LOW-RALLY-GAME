@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="AudioFile" id="{eb0fc156-dad4-456a-904f-126c8d872b31}">
 		<property name="assetPath">
-			<value>JAGER - I won't fall apart.mp3</value>
+			<value>MUSIC/JAGER - I won't fall apart.mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>
