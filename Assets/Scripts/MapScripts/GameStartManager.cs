@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Lap Management")]
     public int totalLaps = 3;
+    public static bool raceStarted = false;
+
 
     [Header("Camera Setup")]
     public ArtOfRallyCamera rallyCamera;
@@ -302,15 +304,15 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         countdownText.gameObject.SetActive(false);
 
-        // ✅ Trigger AI driving state
+        // ✅ UNLOCK input for all cars
+        GameManager.raceStarted = true;
+
         foreach (var car in spawnedCars)
         {
-            if (car.CompareTag(carTag)) // Only AI cars
-            {
-                var ai = car.GetComponent<AICarController>();
-                if (ai != null)
-                    ai.ForceStartDriving();
-            }
+            var ai = car.GetComponent<AICarController>();
+            if (ai != null)
+                ai.ForceStartDriving();
         }
+
     }
 }

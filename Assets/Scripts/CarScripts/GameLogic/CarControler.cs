@@ -155,7 +155,7 @@ public class CarController : MonoBehaviour
     {
         ApplyGripFromNavMesh();
 
-        if (!isAIControlled) // Player-controlled mode
+        if (!isAIControlled && GameManager.raceStarted) // Player-controlled mode 
         {
             gasInput = Input.GetAxis("Vertical");
             if (Mathf.Abs(gasInput) < 0.05f) gasInput = 0f; // Dead zone

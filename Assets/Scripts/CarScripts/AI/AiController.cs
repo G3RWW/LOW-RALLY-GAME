@@ -416,10 +416,9 @@ public class AICarController : MonoBehaviour
     }
     public void ForceStartDriving()
     {
-        currentState = AIState.Driving;
-        Debug.Log($"▶️ {name} forced into Driving state.");
+        if (GameManager.raceStarted)
+            currentState = AIState.Driving;
     }
-
     //=================================================================================================================================================================================================================================================
     // AI Logic
     void ApplySteering()
@@ -477,7 +476,6 @@ public class AICarController : MonoBehaviour
         if (debugDrawBezierCurve)
             Debug.DrawLine(transform.position, clampedTarget, Color.blue);
     }
-
     void ApplyThrottleAndBrakes()
     {
         float speed = carController._rigidbody.linearVelocity.magnitude;
@@ -629,7 +627,6 @@ public class AICarController : MonoBehaviour
             }
         }
     }
-
     void NextWaypoint()
     {
         currentWaypointIndex++;
@@ -724,7 +721,6 @@ public class AICarController : MonoBehaviour
             Log($"🏁 Joker Lap completed! Lap {lapCount}");
         }
     }
-
     Transform FindClosestJokerLapEntry()
     {
         float minDist = Mathf.Infinity;
@@ -976,7 +972,6 @@ public class AICarController : MonoBehaviour
 
         return Vector3.zero;
     }
-
     //=================================================================================================================================================================================================================================================
     // Debugging
     void DrawDebugLines()
