@@ -110,6 +110,7 @@ public class CarController : MonoBehaviour
     public bool debugBrakeLights = false;
 
 //=============================================================================================
+// Initialization
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -221,6 +222,7 @@ public class CarController : MonoBehaviour
         }
     }
 //=============================================================================================
+// NavMesh Area Detection and Wheeel physics
     int GetNavMeshAreaAtPosition(Vector3 position)
     {
         if (NavMesh.SamplePosition(position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
@@ -407,7 +409,6 @@ public class CarController : MonoBehaviour
             UpdateWheelPose(wheelColliderRr, wheelRr);
         }
     }
-
     void UpdateWheelPose(WheelCollider collider, Transform wheelTransform)
     {
         Vector3 position;
@@ -417,8 +418,8 @@ public class CarController : MonoBehaviour
         wheelTransform.position = position;
         wheelTransform.rotation = rotation;
     }
-
-    //=============================================================================================
+//=============================================================================================
+// Handle and setup brakes
     void SetupBrakeLights()
     {
         if (monoBrakeLight != null)
@@ -534,6 +535,7 @@ public class CarController : MonoBehaviour
         wheelColliderFr.sidewaysFriction = frontFriction;
     }
 //=============================================================================================
+// Handle steering input and apply dynamic steering limits
     public void HandleSteering(float steer)
     {
         float speed = _rigidbody.linearVelocity.magnitude * 3.6f; // Convert m/s to km/h
@@ -553,7 +555,7 @@ public class CarController : MonoBehaviour
         // Reduce steering effectiveness if FWD (understeer prevention)
         if (carData.drivetrain == DrivetrainType.FWD)
         {
-            adjustedSteering *= 0.9f; 
+            adjustedSteering *= 0.9f;
         }
         // Increase effectiveness if RWD (better rotation)
         else if (carData.drivetrain == DrivetrainType.RWD)
@@ -600,8 +602,9 @@ public class CarController : MonoBehaviour
         wheelColliderRr.sidewaysFriction = rearFriction;
         wheelColliderFl.sidewaysFriction = frontFriction;
         wheelColliderFr.sidewaysFriction = frontFriction;
-    }   
+    }
 //=============================================================================================
+// Calculate the torque based on gas input and current gear
     void HandleTransmission(float throttle)
     {
 
@@ -888,8 +891,6 @@ public class CarController : MonoBehaviour
 
         return torque;
     }
-
-//=============================================================================================
     void ApplyNaturalDeceleration()
     {
         if (Mathf.Abs(gasInput) < 0.01f && !isBraking && !isHandbraking) // If no gas and not braking
@@ -918,6 +919,7 @@ public class CarController : MonoBehaviour
 
     }
 //=============================================================================================
+// Skid Marks and Dirt Particles
     private TrailRenderer CreateSkidTrail()
     {
         if (skidPrefab == null) return null;
@@ -1176,6 +1178,7 @@ public class CarController : MonoBehaviour
         return asphaltSmokeMaterial;                                // Default → Asphalt
     }
 //=============================================================================================
+// AI Control Methods
     public void SetAIGas(float gas)
     {
         if (isAIControlled)
@@ -1199,85 +1202,4 @@ public class CarController : MonoBehaviour
         }
     }
 //=============================================================================================
-    /*void OnApplicationQuit()
-    {
-        // ✅ Append log data instead of overwriting
-        File.AppendAllText(logFilePath, logData.ToString());
-        Debug.Log($"Debug log saved to: {logFilePath}");
-    }
-    void DetectWheelColliderAnomalies()
-    {
-        WheelCollider[] wheels = { wheelColliderFl, wheelColliderFr, wheelColliderRl, wheelColliderRr };
-
-        for (int i = 0; i < wheels.Length; i++)
-        {
-            WheelHit hit;
-            if (wheels[i].GetGroundHit(out hit))
-            {
-                float suspensionDistance = hit.force; // Get suspension compression force
-
-                // Check for sudden suspension force changes (twitching detection)
-                if (Mathf.Abs(suspensionDistance - lastSuspensionDistances[i]) > suspensionThreshold)
-                {
-                    string wheelName = i switch
-                    {
-                        0 => "Front Left",
-                        1 => "Front Right",
-                        2 => "Rear Left",
-                        3 => "Rear Right",
-                        _ => "Unknown"
-                    };
-                    if(debugTwitchDetection)
-                    {
-                        Debug.LogWarning($"[Twitching Detected] {wheelName} suspension changed too fast: Δ {Mathf.Abs(suspensionDistance - lastSuspensionDistances[i]):F4}");
-                        logData.AppendLine($"[Twitching Detected] {wheelName} suspension change: Δ {Mathf.Abs(suspensionDistance - lastSuspensionDistances[i]):F4} at {Time.time:F2}s");
-                    }
-                }
-
-                lastSuspensionDistances[i] = suspensionDistance;
-            }
-        }
-    }
-    void DetectCarJumping()
-    {
-        float verticalVelocity = (_rigidbody.position.y - lastCarPosition.y) / Time.fixedDeltaTime;
-
-        // Check if car suddenly jumps upwards
-        if (Mathf.Abs(verticalVelocity - lastCarYVelocity) > jumpThreshold)
-        {
-            if (debugJumpDetection)
-            {
-                Debug.LogWarning($"[Jump Detected] Car jumped too fast: Δ {Mathf.Abs(verticalVelocity - lastCarYVelocity):F4} m/s");
-                logData.AppendLine($"[Jump Detected] Car jumped too fast: Δ {Mathf.Abs(verticalVelocity - lastCarYVelocity):F4} m/s at {Time.time:F2}s");
-            }
-        }
-
-        lastCarYVelocity = verticalVelocity;
-        lastCarPosition = _rigidbody.position;
-    }
-    void DebugGripChanges()
-    {
-        WheelHit hit;
-        WheelCollider[] wheels = { wheelColliderFl, wheelColliderFr, wheelColliderRl, wheelColliderRr };
-        string[] names = { "Front Left", "Front Right", "Rear Left", "Rear Right" };
-
-        for (int i = 0; i < wheels.Length; i++)
-        {
-            if (wheels[i].GetGroundHit(out hit))
-            {
-                float sidewaysSlip = hit.sidewaysSlip;
-                float forwardSlip = hit.forwardSlip;
-
-                if (Mathf.Abs(sidewaysSlip) > 0.25f || Mathf.Abs(forwardSlip) > 0.35f)
-                {
-                    if (!debugGripChange) return;
-                    {
-                        Debug.Log($"🛞 Grip Loss on {names[i]} | Side Slip: {sidewaysSlip:F2} | Forward Slip: {forwardSlip:F2}");
-                        logData.AppendLine($"[Grip Loss] {names[i]} | Side Slip: {sidewaysSlip:F2}, Forward Slip: {forwardSlip:F2} @ {Time.time:F2}s");
-                    }
-                }
-            }
-        }
-    }
-    */
 }

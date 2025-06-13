@@ -56,6 +56,12 @@ public class GameManager : MonoBehaviour
     public float countdownTime = 3f;
     public UnityEngine.UI.Text countdownText;
 
+    [Header("Car Names")]
+    public List<string> possibleCarNames = new List<string> {
+        "ShadowFox", "WildViper", "BlazeRunner", "SteelStorm", "NightWolf",
+        "RallyKing", "DustHunter", "DriftQueen", "RedComet", "SkyBreaker"
+    };
+    private List<string> usedCarNames = new List<string>();
 
 
     [Header("Lap UI")]
@@ -63,7 +69,8 @@ public class GameManager : MonoBehaviour
     public UnityEngine.UI.Text lapTimeText;
     public UnityEngine.UI.Text lastLapTimeText;
     public UnityEngine.UI.Text bestLapTimeText;
-
+//===============================================================================================================================
+// Initialization
     void Start()
     {
         GameObject[] allPrefabs = Resources.LoadAll<GameObject>("carPrefabs/new");
@@ -78,6 +85,10 @@ public class GameManager : MonoBehaviour
             return;
 
         }
+
+        // Filter out AI-incompatible car(s)
+        loadedPrefabs.RemoveAll(p => p.name == "vw_polo_wrc_2013_(ver_1)"); // <- 👈 block AI from using this one
+
         showRPMBar = RPMSettingsManager.Instance.ShowRPMBar;
         showRPMNeedle = RPMSettingsManager.Instance.ShowRPMNeedle;
         ApplyRPMUIVisibility();
@@ -86,10 +97,50 @@ public class GameManager : MonoBehaviour
         SpawnCars(); // Keep your original flow
         StartCoroutine(RaceStartCountdown());
     }
+    private IEnumerator RaceStartCountdown()
+    {
+        countdownText.gameObject.SetActive(true);
+        float timeLeft = countdownTime;
+
+        while (timeLeft > 0)
+        {
+            countdownText.text = Mathf.Ceil(timeLeft).ToString("F0");
+            yield return new WaitForSeconds(1f);
+            timeLeft--;
+        }
+
+        countdownText.text = "GO!";
+        yield return new WaitForSeconds(1f);
+        countdownText.gameObject.SetActive(false);
+
+        // ✅ UNLOCK input for all cars
+        GameManager.raceStarted = true;
+
+        foreach (var car in spawnedCars)
+        {
+            var ai = car.GetComponent<AICarController>();
+            if (ai != null)
+                ai.ForceStartDriving();
+        }
+
+    }
+//===============================================================================================================================
+// Spawning Cars
     void SpawnCars()
     {
+        // Step 1: Prepare list of spawn indices
+        List<int> spawnIndices = new List<int>();
+        for (int i = 0; i < spawnPoints.Length; i++)
+            spawnIndices.Add(i);
+
+        // Step 2: Pick random index for player car
+        playerCarIndex = Random.Range(0, spawnIndices.Count);
+        int playerSpawnIndex = spawnIndices[playerCarIndex];
+
+        // Step 3: Instantiate cars at each spawn point
         for (int i = 0; i < spawnPoints.Length; i++)
         {
+            int spawnIndex = spawnIndices[i];
             GameObject prefabToUse;
 
             if (i == playerCarIndex)
@@ -98,13 +149,28 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // Pick a random prefab for AI
-                int randomIndex = Random.Range(0, loadedPrefabs.Count);
-                prefabToUse = loadedPrefabs[randomIndex];
+                // Get AI prefab (skip player car prefab)
+                List<GameObject> validAIPrefabs = loadedPrefabs.FindAll(p => p != playerCarPrefab);
+                if (validAIPrefabs.Count == 0)
+                {
+                    Debug.LogError("❌ No valid AI car prefabs available.");
+                    continue;
+                }
+
+                int randomIndex = Random.Range(0, validAIPrefabs.Count);
+                prefabToUse = validAIPrefabs[randomIndex];
             }
 
-            GameObject car = Instantiate(prefabToUse, spawnPoints[i].position, spawnPoints[i].rotation);
-            car.name = $"Car_{i + 1}";
+            GameObject car = Instantiate(prefabToUse, spawnPoints[spawnIndex].position, spawnPoints[spawnIndex].rotation);
+
+            if (i == playerCarIndex)
+            {
+                car.name = "Player";
+            }
+            else
+            {
+                car.name = GetUniqueRandomName();
+            }
 
             bool isAI = (i != playerCarIndex);
             SetupCar(car, isAI, i);
@@ -112,54 +178,27 @@ public class GameManager : MonoBehaviour
 
         AssignPlayerCameraAndUI();
     }
-    public void OnCarLapCompleted(GameObject car)
+    List<Transform> CloneWaypoints(List<Transform> source, Transform parent, string prefix)
     {
-        if (!carLapTimers.ContainsKey(car)) return;
-
-        LapTimer timer = carLapTimers[car];
-        if (timer.completedLaps >= totalLaps)
+        var list = new List<Transform>();
+        foreach (Transform wp in source)
         {
-            Debug.Log($"🏁 {car.name} finished the race! Total Time: {timer.GetTotalTime():F2}s");
-        }
-    }
-    public int GetCarLap(GameObject car)
-    {
-        return carLapTimers.TryGetValue(car, out LapTimer timer) ? timer.completedLaps : 0;
-    }
-    public float GetCarTime(GameObject car)
-    {
-        return carLapTimers.TryGetValue(car, out LapTimer timer)
-            ? timer.GetTotalTime()
-            : 9999f;
-    }
-    public int GetPosition(GameObject car)
-    {
-        int position = 1;
-        int carLap = GetCarLap(car);
-        float carTime = GetCarTime(car);
+            GameObject clone = new($"{prefix}_{wp.name}");
+            clone.transform.position = wp.position;
+            clone.transform.rotation = wp.rotation;
+            clone.transform.parent = parent;
 
-        foreach (var other in spawnedCars)
-        {
-            if (other == car) continue;
-
-            int otherLap = GetCarLap(other);
-            float otherTime = GetCarTime(other);
-
-            if (otherLap > carLap || (otherLap == carLap && otherTime < carTime))
+            // Copy WaypointSideBias if it exists
+            WaypointSideBias originalBias = wp.GetComponent<WaypointSideBias>();
+            if (originalBias != null)
             {
-                position++;
+                WaypointSideBias newBias = clone.AddComponent<WaypointSideBias>();
+                newBias.preferredSide = originalBias.preferredSide;
             }
+
+            list.Add(clone.transform);
         }
-
-        return position;
-    }
-    void ApplyRPMUIVisibility()
-    {
-        if (rpmBarObject != null)
-            rpmBarObject.SetActive(showRPMBar);
-
-        if (analogSpeedMeterObject != null)
-            analogSpeedMeterObject.SetActive(showRPMNeedle);
+        return list;
     }
     void SetupCar(GameObject car, bool isAI, int index)
     {
@@ -215,18 +254,73 @@ public class GameManager : MonoBehaviour
             carLapTimers[car] = lapTimer;
         }
     }
-    List<Transform> CloneWaypoints(List<Transform> source, Transform parent, string prefix)
+    private string GetUniqueRandomName()
     {
-        var list = new List<Transform>();
-        foreach (Transform wp in source)
+        if (possibleCarNames.Count == 0)
+            return "UnknownCar";
+
+        List<string> available = new List<string>(possibleCarNames);
+        available.RemoveAll(name => usedCarNames.Contains(name));
+
+        if (available.Count == 0)
+            return "Car_" + Random.Range(1000, 9999); // fallback
+
+        string picked = available[Random.Range(0, available.Count)];
+        usedCarNames.Add(picked);
+        return picked;
+    }
+//===============================================================================================================================
+// Lap Management
+    public void OnCarLapCompleted(GameObject car)
+    {
+        if (!carLapTimers.ContainsKey(car)) return;
+
+        LapTimer timer = carLapTimers[car];
+        if (timer.completedLaps >= totalLaps)
         {
-            GameObject clone = new($"{prefix}_{wp.name}");
-            clone.transform.position = wp.position;
-            clone.transform.rotation = wp.rotation;
-            clone.transform.parent = parent;
-            list.Add(clone.transform);
+            Debug.Log($"🏁 {car.name} finished the race! Total Time: {timer.GetTotalTime():F2}s");
         }
-        return list;
+    }
+    public int GetCarLap(GameObject car)
+    {
+        return carLapTimers.TryGetValue(car, out LapTimer timer) ? timer.completedLaps : 0;
+    }
+    public float GetCarTime(GameObject car)
+    {
+        return carLapTimers.TryGetValue(car, out LapTimer timer)
+            ? timer.GetTotalTime()
+            : 9999f;
+    }
+    public int GetPosition(GameObject car)
+    {
+        int position = 1;
+        int carLap = GetCarLap(car);
+        float carTime = GetCarTime(car);
+
+        foreach (var other in spawnedCars)
+        {
+            if (other == car) continue;
+
+            int otherLap = GetCarLap(other);
+            float otherTime = GetCarTime(other);
+
+            if (otherLap > carLap || (otherLap == carLap && otherTime < carTime))
+            {
+                position++;
+            }
+        }
+
+        return position;
+    }
+//===============================================================================================================================
+// UI Management
+    void ApplyRPMUIVisibility()
+    {
+        if (rpmBarObject != null)
+            rpmBarObject.SetActive(showRPMBar);
+
+        if (analogSpeedMeterObject != null)
+            analogSpeedMeterObject.SetActive(showRPMNeedle);
     }
     void AssignPlayerCameraAndUI()
     {
@@ -287,32 +381,5 @@ public class GameManager : MonoBehaviour
     {
         showRPMNeedle = value;
         if (analogSpeedMeterObject != null) analogSpeedMeterObject.SetActive(value);
-    }
-    private IEnumerator RaceStartCountdown()
-    {
-        countdownText.gameObject.SetActive(true);
-        float timeLeft = countdownTime;
-
-        while (timeLeft > 0)
-        {
-            countdownText.text = Mathf.Ceil(timeLeft).ToString("F0");
-            yield return new WaitForSeconds(1f);
-            timeLeft--;
-        }
-
-        countdownText.text = "GO!";
-        yield return new WaitForSeconds(1f);
-        countdownText.gameObject.SetActive(false);
-
-        // ✅ UNLOCK input for all cars
-        GameManager.raceStarted = true;
-
-        foreach (var car in spawnedCars)
-        {
-            var ai = car.GetComponent<AICarController>();
-            if (ai != null)
-                ai.ForceStartDriving();
-        }
-
     }
 }

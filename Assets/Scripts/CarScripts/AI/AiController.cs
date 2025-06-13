@@ -123,6 +123,7 @@ public class AICarController : MonoBehaviour
     public float currentSpeedKmh;
     //=================================================================================================================================================================================================================================================
     // Initialization
+    // Called when the script instance is being loaded
     void Start()
     {
         carController = GetComponent<CarController>();
@@ -238,6 +239,7 @@ public class AICarController : MonoBehaviour
     }
     //=================================================================================================================================================================================================================================================
     // State Handlers
+    // Handles the AI's idle state, which can be expanded later
     void HandleIdleState()
     {
         /*
@@ -420,7 +422,8 @@ public class AICarController : MonoBehaviour
             currentState = AIState.Driving;
     }
     //=================================================================================================================================================================================================================================================
-    // AI Logic
+    // AI Behavior Logic
+    // Calculates and applies steering towards the next waypoint using Bezier curves
     void ApplySteering()
     {
         List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
@@ -583,6 +586,7 @@ public class AICarController : MonoBehaviour
     }
     //=================================================================================================================================================================================================================================================
     // Waypoint Navigation
+    // Checks if waypoints are available for navigation 
     bool CheckWaypointAvailability() 
     {
         List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
@@ -741,6 +745,7 @@ public class AICarController : MonoBehaviour
     }
     //=================================================================================================================================================================================================================================================
     // NavMesh Handling
+    // Updates the NavMeshAgent's destination and handles recovery if off NavMesh
     void UpdateNavMeshAgent(Transform targetWaypoint)
     {
         if (!IsOnNavMesh(transform.position))
@@ -879,6 +884,7 @@ public class AICarController : MonoBehaviour
     }
     //=================================================================================================================================================================================================================================================
     // Obstacle Detection
+    // Detects static obstacles and cars ahead using raycasts
     bool DetectObstaclesAhead()
     {
         float speed = carController._rigidbody.linearVelocity.magnitude;
@@ -974,6 +980,7 @@ public class AICarController : MonoBehaviour
     }
     //=================================================================================================================================================================================================================================================
     // Debugging
+    // Logs with color-coded prefixes
     void DrawDebugLines()
     {
         if (debugWaypointPath)

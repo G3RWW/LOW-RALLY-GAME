@@ -5,6 +5,8 @@ public class PauseManager : MonoBehaviour
 {
     public GameObject pauseMenuUI;
     public GameObject settingsUI; // Optional: Reference to settings UI if you have one
+    public GameObject controlsPanel;
+
     private bool isPaused = false;
 
     void Update()
@@ -37,10 +39,24 @@ public class PauseManager : MonoBehaviour
     {
         pauseMenuUI.SetActive(false);
         settingsUI.SetActive(true);
+        controlsPanel.SetActive(false);
         Time.timeScale = 0f;
         isPaused = true;
         FMODAudioManager.Instance.SetEngineMuted(true);
     }
+
+    public void ShowControlsPanel()
+    {
+        settingsUI.SetActive(false);
+        controlsPanel.SetActive(true);
+    }
+
+    public void BackToSettings()
+    {
+        controlsPanel.SetActive(false);
+        settingsUI.SetActive(true);
+    }
+
 
     public void RestartScene()
     {
