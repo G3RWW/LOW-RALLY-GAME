@@ -7,7 +7,7 @@ using System.Collections.Generic;
         Careful,
         Aggressive,
         //Slow,     // 🚗 Noob-like behavior
-        //Fast      // 🏎️ Pro-like behavior
+        Fast      // 🏎️ Pro-like behavior
     }
 
     public enum AIState
@@ -22,18 +22,17 @@ public class AICarController : MonoBehaviour
 {
     [Header("Link to Car Controller")]
     private CarController carController;
-
+    //=================================================================================================================================================================================================================================================
     [Header("Waypoint Navigation")]
     public WayPointContainerScript wayPointContainer;
     public List<Transform> waypoints = new List<Transform>();
     public int currentWaypointIndex = 0;
-    public float waypointRange = 0.5f; // AI must be within 0.5m of the waypoint before switching
+    public float waypointRange = 0.6f; // AI must be within 0.5m of the waypoint before switching
     private HashSet<Transform> visitedWaypoints = new HashSet<Transform>();
-
-
+    //=================================================================================================================================================================================================================================================
     [Header("Navigation Target")]
     public NavMeshAgent agentFollower; // Reference to the child NavMeshAgent
-
+    //=================================================================================================================================================================================================================================================
     [Header("AI Steering & Speed")]
     private float currentGasInput = 0f;
     private float currentBrakeInput = 0f;
@@ -46,26 +45,26 @@ public class AICarController : MonoBehaviour
     private float targetSpeed = 25f; // AI adapts speed based on upcoming turns
     private float minTurnSpeed = 10f; // Minimum speed in sharp turns
     private float maxStraightSpeed = 30f; // Maximum speed on straight roads
-
+    //=================================================================================================================================================================================================================================================
     [Header("Obstacle Avoidance")]
     public float baseObstacleRange = 20f;
     public LayerMask obstacleLayers;
     public LayerMask carLayer;
-
+    //=================================================================================================================================================================================================================================================
     [Header("Overtaking")]
     private Vector3 overtakeTargetOffset = Vector3.zero;
     private Vector3 overtakeTargetPosition = Vector3.zero;
     private Transform overtakeTargetCar = null;
     private BoxCollider carCollider;
     private float carWidth = 2f; // fallback
-
+    //=================================================================================================================================================================================================================================================
     [Header("Surrounding Obstacle Detection")]
     public float detectionRadius = 4f;
     public float minAvoidanceSteer = 0.3f;
     public AIBehaviorType aiBehavior = AIBehaviorType.Careful;
     public float overtakeBoost = 1.3f; // How much faster the car tries to go during overtake
     public float sideOffset = 2f;      // How far it tries to move left/right to overtake
-
+    //=================================================================================================================================================================================================================================================
     [Header("Joker Lap Settings")]
     public Transform jokerLapExitPoint; // Exit point for the Joker Lap
     private bool isTakingJokerLap = false;
@@ -106,7 +105,7 @@ public class AICarController : MonoBehaviour
     private float maxRecoveryTime = 5f;
     private Vector3 recoveryTarget;
     private int lastValidWaypointIndex = 0;
-
+    //=================================================================================================================================================================================================================================================
     [Header("Debugging Toggles")]
     public bool debugSteeringLine = false;
     public bool debugClampedTarget = false;
@@ -166,17 +165,17 @@ public class AICarController : MonoBehaviour
         switch (aiBehavior)
         {
             case AIBehaviorType.Aggressive: // Automobilis 1
-                maxStraightSpeed = 30f;
-                minTurnSpeed = 12f;
-                overtakeBoost = 1.3f;
-                AiMaxAngle = 50f;
+                maxStraightSpeed = 80f;
+                minTurnSpeed = 24f;
+                overtakeBoost = 2.5f;
+                AiMaxAngle = 60f;
                 break;
 
             case AIBehaviorType.Careful: // Automobilis 2
-                maxStraightSpeed = 25f;
+                maxStraightSpeed = 50f;
                 minTurnSpeed = 10f;
                 overtakeBoost = 1.2f;
-                AiMaxAngle = 40f;
+                AiMaxAngle = 70f;
                 break;
 
             /*
@@ -186,14 +185,15 @@ public class AICarController : MonoBehaviour
                 overtakeBoost = 1.1f;
                 AiMaxAngle = 35f;
                 break;
+            */
 
             case AIBehaviorType.Fast:
-                maxStraightSpeed = 38f;
-                minTurnSpeed = 15f;
-                overtakeBoost = 1.5f;
-                AiMaxAngle = 55f;
+                maxStraightSpeed = 100f;
+                minTurnSpeed = 30f;
+                overtakeBoost = 4.0f;
+                AiMaxAngle = 60f;
                 break;
-            */
+            
             
         }
 
@@ -228,6 +228,17 @@ public class AICarController : MonoBehaviour
 
         Log($"AI State: {currentState}");
 
+    }
+    void FixedUpdate()
+    {
+        if (!IsOnNavMesh(transform.position))
+        {
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position; // hard clamp
+                LogWarning("🚧 Position clamped to NavMesh!");
+            }
+        }
     }
     void LateUpdate()
     {
@@ -278,6 +289,14 @@ public class AICarController : MonoBehaviour
         UpdateNavMeshAgent(targetWaypoint);
         // Calculate and apply steering towards the target
         ApplySteering();
+        // Check if the AI is too close to the NavMesh edge
+        if (!IsPositionSafeOnNavMesh(transform.position, carWidth * 0.5f + 0.2f))
+        {
+            LogWarning("⚠️ Car drifted too close to NavMesh edge. Entering recovery.");
+            currentState = AIState.Recovery;
+            return;
+        }
+
         // Adjust speed if a turn is approaching
         AdjustSpeedBeforeTurn();
         // Apply throttle and brake inputs based on target speed
@@ -292,12 +311,17 @@ public class AICarController : MonoBehaviour
         float speed = carController._rigidbody.linearVelocity.magnitude;
         float detectDistance = baseObstacleRange + speed * 0.6f; // Dynamic detection range based on speed
         Vector3 origin = transform.position + Vector3.up * 0.5f; // Raise raycast origin slightly
-        Vector3 forward = transform.forward;
+        // Use turning direction if turning, else just forward
+        Vector3 detectionDirection = smoothSteering != 0f 
+            ? Quaternion.Euler(0f, smoothSteering * AiMaxAngle, 0f) * transform.forward 
+            : transform.forward;
+
+
 
         if (overtakeTargetCar == null)
         {
             // Look for a car ahead to overtake
-            if (Physics.Raycast(origin, forward, out RaycastHit hit, detectDistance, carLayer))
+            if (Physics.Raycast(origin, detectionDirection, out RaycastHit hit, detectDistance, carLayer))
             {
                 overtakeTargetCar = hit.transform;
             }
@@ -324,7 +348,7 @@ public class AICarController : MonoBehaviour
             }
 
             // Evaluate which side to overtake (re-evaluated every frame)
-            overtakeTargetOffset = EvaluateOvertakeSide(forward);
+            overtakeTargetOffset = EvaluateOvertakeSide(detectionDirection);
 
             if (overtakeTargetOffset == Vector3.zero)
             {
@@ -340,7 +364,7 @@ public class AICarController : MonoBehaviour
             }
 
             // Calculate target position for overtaking
-            Vector3 tentativeTarget = transform.position + forward * 10f + overtakeTargetOffset;
+            Vector3 tentativeTarget = transform.position + detectionDirection * 10f + overtakeTargetOffset;
             overtakeTargetPosition = GetNavMeshEdgeClamp(tentativeTarget, 1f);
 
             // Predict if the path is safe on NavMesh
@@ -362,7 +386,7 @@ public class AICarController : MonoBehaviour
             // Smooth steering and gas input
             smoothSteering = Mathf.Lerp(smoothSteering, steerAmount, Time.deltaTime * 3f);
             float tightTurnSpeed = Mathf.Max(minTurnSpeed * 0.8f, 8f);
-            targetSpeed = Mathf.Lerp(tightTurnSpeed, maxStraightSpeed * overtakeBoost, 0.4f);
+            targetSpeed = Mathf.Lerp(tightTurnSpeed, maxStraightSpeed * overtakeBoost, 0.7f);
             // Apply gas input based on target speed
             currentGasInput = Mathf.Lerp(currentGasInput, 0.7f, Time.deltaTime * 1.5f); // Slower accel
 
@@ -404,6 +428,7 @@ public class AICarController : MonoBehaviour
             Vector3 position = lastWaypoint.position;
             Vector3 forward = (nextWaypoint.position - lastWaypoint.position).normalized;
 
+
             transform.position = position;
             transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
             carController._rigidbody.linearVelocity = Vector3.zero;
@@ -426,58 +451,35 @@ public class AICarController : MonoBehaviour
     // Calculates and applies steering towards the next waypoint using Bezier curves
     void ApplySteering()
     {
-        List<Transform> currentPath = isTakingJokerLap ? jokerWaypoints : waypoints;
-        int index = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
-        if (index >= currentPath.Count - 1) return;
+        List<Transform> path = isTakingJokerLap ? jokerWaypoints : waypoints;
+        int i = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
 
-        Vector3 start = transform.position;
-        Transform control = currentPath[index];
-        Vector3 controlPos = control.position;
+        if (path.Count < 4) return; // Still need minimum 4
 
-        Vector3 end = currentPath[index + 1].position;
+        int count = path.Count;
 
-        float t = (aiBehavior == AIBehaviorType.Aggressive) ? 0.2f : 0.4f;
+        Vector3 p0 = path[(i - 1 + count) % count].position;
+        Vector3 p1 = GetNavMeshEdgeClamp(path[i % count].position, 1.2f);
+        Vector3 p2 = GetNavMeshEdgeClamp(path[(i + 1) % count].position, 1.2f);
+        Vector3 p3 = GetNavMeshEdgeClamp(path[(i + 2) % count].position, 1.2f);
 
-        Vector3 bezierTarget =
-            Mathf.Pow(1 - t, 2) * start +
-            2 * (1 - t) * t * controlPos +
-            Mathf.Pow(t, 2) * end;
 
-        // === NEW SIDE OFFSET LOGIC ===
-        float laneOffsetAmount = 0f;
+        float speed = carController._rigidbody.linearVelocity.magnitude;
+        float lookaheadDistance = Mathf.Clamp(speed * 0.8f, 3f, 20f); // Adjustable
 
-        // Check if overtaking
-        if (currentState == AIState.Overtaking)
-            laneOffsetAmount = (overtakeTargetOffset.x > 0f) ? +2.5f : -2.5f;
+        Vector3 curveTarget = GetClampedCurvePoint(p0, p1, p2, p3, lookaheadDistance);
+        Vector3 clampedTarget = GetNavMeshEdgeClamp(curveTarget, 1.2f);
 
-        // Check for WaypointSideBias
-        var biasComp = control.GetComponent<WaypointSideBias>();
-        if (biasComp != null)
-        {
-            switch (biasComp.preferredSide)
-            {
-                case WaypointSideBias.RoadSide.Left: laneOffsetAmount = +2f; break;
-                case WaypointSideBias.RoadSide.Right: laneOffsetAmount = -2f; break;
-            }
-        }
-
-        Vector3 lateralOffset = Vector3.Cross(Vector3.up, end - controlPos).normalized * laneOffsetAmount;
-        bezierTarget += lateralOffset;
-        // === END SIDE OFFSET LOGIC ===
-
-        Vector3 clampedTarget = GetNavMeshEdgeClamp(bezierTarget, 1.2f);
         Vector3 steerDirection = (clampedTarget - transform.position).normalized;
         currentAngle = Vector3.SignedAngle(transform.forward, steerDirection, Vector3.up);
 
         float steerAmount = Mathf.Clamp(currentAngle / AiMaxAngle, -1f, 1f);
-        smoothSteering = Mathf.Lerp(smoothSteering, steerAmount, Time.deltaTime * 5f);
+        smoothSteering = Mathf.Lerp(smoothSteering, steerAmount, Time.deltaTime * 7f);
+
         carController.SetAISteering(smoothSteering);
 
-        if (debugDrawStraightLine)
-            Debug.DrawLine(controlPos, end, Color.red);
-
         if (debugDrawBezierCurve)
-            Debug.DrawLine(transform.position, clampedTarget, Color.blue);
+            Debug.DrawLine(transform.position, clampedTarget, Color.green);
     }
     void ApplyThrottleAndBrakes()
     {
@@ -486,7 +488,7 @@ public class AICarController : MonoBehaviour
         float desiredBrake = CalculateBraking();
 
         // 🔁 Gas transitions slower (smoother acceleration)
-        currentGasInput = Mathf.Lerp(currentGasInput, desiredBrake > 0f ? 0f : desiredGas, Time.deltaTime * 2.5f);
+        currentGasInput = Mathf.Lerp(currentGasInput, 1f, Time.deltaTime * 2.5f); // max power during overtake
 
         // ⏩ Brake responds faster (for sharp corners)
         currentBrakeInput = Mathf.Lerp(currentBrakeInput, desiredBrake, Time.deltaTime * 8f);
@@ -516,7 +518,14 @@ public class AICarController : MonoBehaviour
             targetSpeed = 22f;               // Small bend
         else
             targetSpeed = maxStraightSpeed; // Almost straight
-        if(debugSpeedAdjustment)
+            
+        if (WillCurveLeaveNavMesh(currentSpeedKmh / 3.6f)) // convert back to m/s
+        {
+            targetSpeed = Mathf.Min(targetSpeed, minTurnSpeed);
+            LogWarning("🚧 Lowering speed due to predicted unsafe curve path.");
+        }
+
+        if (debugSpeedAdjustment)
         {
             Log($"🌀 Adjusting AI Speed: {targetSpeed:F2} for turn angle: {nextAngle:F2}°");
 
@@ -525,14 +534,15 @@ public class AICarController : MonoBehaviour
     float CalculateBraking()
     {
         if (isInRecoveryMode) return 0f;
-        
 
         float speed = carController._rigidbody.linearVelocity.magnitude;
         if (speed < 5f) return 0f;
 
-        // Dynamic lookahead based on speed
+        float brakeStrength = 0f;
+
+        // Dynamic angle-based braking
         int baseLookahead = 2;
-        int speedLookahead = Mathf.FloorToInt(speed / 7f); // +1 per 10 speed
+        int speedLookahead = Mathf.FloorToInt(speed / 7f);
         int lookaheadWaypoints = Mathf.Clamp(baseLookahead + speedLookahead, 2, 6);
 
         float maxSeverity = 0f;
@@ -547,15 +557,11 @@ public class AICarController : MonoBehaviour
             Vector3 dirToNext = (wp.position - transform.position).normalized;
             float angle = Vector3.SignedAngle(currentDir, dirToNext, Vector3.up);
             float severity = Mathf.Abs(angle);
-            if (severity > maxSeverity)
-                maxSeverity = severity;
+            maxSeverity = Mathf.Max(maxSeverity, severity);
 
             currentDir = dirToNext;
         }
 
-        float brakeStrength = 0f;
-
-        // More aggressive braking for sharp turns at high speed
         if (maxSeverity > 60f)
         {
             float angleFactor = Mathf.Clamp01(maxSeverity / 90f);
@@ -569,14 +575,20 @@ public class AICarController : MonoBehaviour
             brakeStrength = Mathf.Clamp(angleFactor * speedFactor, 0f, 0.6f);
         }
 
-        // Prediction fallback
+        // 🧠 NEW: Predict curve path safety
+        if (WillCurveLeaveNavMesh(speed))
+        {
+            LogWarning("🚧 Curve path unsafe! Preemptive braking");
+            brakeStrength = Mathf.Max(brakeStrength, 0.75f);
+        }
+
+        // 🔁 Fallback prediction using trajectory
         if (PredictFutureTrajectoryOffNavMesh(transform.position, transform.forward, speed, smoothSteering))
         {
             LogWarning("⚠️ Predictive: braking for safety!");
             brakeStrength = Mathf.Max(brakeStrength, 0.7f);
         }
 
-        // Force brake in special zones
         if (IsInsideBrakeZone)
         {
             brakeStrength = Mathf.Max(brakeStrength, 0.5f);
@@ -584,6 +596,133 @@ public class AICarController : MonoBehaviour
 
         return Mathf.Clamp01(brakeStrength);
     }
+    Vector3 GetCatmullRomPosition(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        return 0.5f * (
+            2f * p1 +
+            (-p0 + p2) * t +
+            (2f*p0 - 5f*p1 + 4f*p2 - p3) * t * t +
+            (-p0 + 3f*p1 - 3f*p2 + p3) * t * t * t
+        );
+    }
+    Vector3 GetCatmullRomPointAtDistance(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float distance, int samples = 20)
+    {
+        float totalLength = 0f;
+        Vector3 lastPos = p1;
+        float[] distances = new float[samples + 1];
+        Vector3[] points = new Vector3[samples + 1];
+
+        for (int i = 0; i <= samples; i++)
+        {
+            float t = i / (float)samples;
+            Vector3 pt = GetCatmullRomPosition(t, p0, p1, p2, p3);
+            points[i] = pt;
+
+            if (i > 0)
+            {
+                float segmentLength = Vector3.Distance(lastPos, pt);
+                totalLength += segmentLength;
+                distances[i] = totalLength;
+            }
+
+            lastPos = pt;
+        }
+
+        float targetDistance = Mathf.Clamp(distance, 0, totalLength);
+
+        for (int i = 1; i <= samples; i++)
+        {
+            if (distances[i] >= targetDistance)
+            {
+                float tBlend = Mathf.InverseLerp(distances[i - 1], distances[i], targetDistance);
+                return Vector3.Lerp(points[i - 1], points[i], tBlend);
+            }
+        }
+
+        return points[samples]; // fallback
+    }
+    Vector3 GetClampedCurvePoint(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float distance)
+    {
+        int samples = 20;
+        float totalLength = 0f;
+        Vector3 last = p1;
+        Vector3 lastSafe = p1; // in case we need fallback
+        float safetyThreshold = carWidth * 0.5f + 0.3f;
+
+        for (int i = 1; i <= samples; i++)
+        {
+            float t = i / (float)samples;
+            Vector3 pt = GetCatmullRomPosition(t, p0, p1, p2, p3);
+            Vector3 clamped = GetNavMeshEdgeClamp(pt, safetyThreshold);
+
+            bool isSafe = IsPositionSafeOnNavMesh(clamped, safetyThreshold);
+
+            if (debugTrajectoryPrediction)
+            {
+                Color color = isSafe ? Color.green : Color.red;
+                Debug.DrawRay(clamped + Vector3.up * 0.1f, Vector3.up * 0.4f, color, 1f);
+            }
+
+            if (!isSafe)
+            {
+                LogWarning($"🧯 Curve sample at t={t:F2} unsafe. Switching to fallback.");
+                Vector3 safeForward = GetNavMeshEdgeClamp(transform.position + transform.forward * 2f, safetyThreshold);
+                return safeForward;
+            }
+
+            float segmentLength = Vector3.Distance(last, clamped);
+            totalLength += segmentLength;
+
+            if (totalLength >= distance)
+                return clamped;
+
+            last = clamped;
+            lastSafe = clamped;
+        }
+
+        return lastSafe; // if nothing meets distance, return furthest safe point
+    }
+    bool WillCurveLeaveNavMesh(float speed)
+{
+    List<Transform> path = isTakingJokerLap ? jokerWaypoints : waypoints;
+    int i = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
+
+    if (path.Count < 4)
+    return false;
+
+    int count = path.Count;
+
+    Vector3 p0 = path[(i - 1 + count) % count].position;
+    Vector3 p1 = path[i % count].position;
+    Vector3 p2 = path[(i + 1) % count].position;
+    Vector3 p3 = path[(i + 2) % count].position;
+
+
+    float lookaheadDistance = Mathf.Clamp(speed * 0.8f, 3f, 20f);
+    int samples = 10;
+    float totalLength = 0f;
+    Vector3 last = p1;
+
+    for (int j = 1; j <= samples; j++)
+    {
+        float t = j / (float)samples;
+        Vector3 point = GetCatmullRomPosition(t, p0, p1, p2, p3);
+        Vector3 clamped = GetNavMeshEdgeClamp(point, 1.2f);
+        totalLength += Vector3.Distance(last, clamped);
+
+        if (!IsPositionSafeOnNavMesh(clamped, 0.8f))
+        {
+            if (debugTrajectoryPrediction)
+                Debug.DrawRay(clamped + Vector3.up * 0.3f, Vector3.up * 0.4f, Color.red, 1f);
+
+            return true;
+        }
+
+        last = clamped;
+    }
+
+    return false;
+}
     //=================================================================================================================================================================================================================================================
     // Waypoint Navigation
     // Checks if waypoints are available for navigation 
@@ -786,7 +925,16 @@ public class AICarController : MonoBehaviour
         }
         else
         {
-            agentFollower.SetDestination(targetWaypoint.position);
+            Vector3 safeTarget = GetNavMeshEdgeClamp(targetWaypoint.position, carWidth * 0.5f + 0.2f);
+            agentFollower.SetDestination(safeTarget);
+
+            if (!IsPositionSafeOnNavMesh(safeTarget, carWidth * 0.5f + 0.2f))
+            {
+                Vector3 forwardSafe = GetNavMeshEdgeClamp(transform.position + transform.forward * 3f, 1.2f);
+                agentFollower.SetDestination(forwardSafe);
+                LogWarning("⚠️ Target not safe, using forward-safe point instead.");
+                return;
+            }
         }
     }
     private bool IsPositionSafeOnNavMesh(Vector3 position, float edgeThreshold = 0.5f)
@@ -829,10 +977,11 @@ public class AICarController : MonoBehaviour
             }
 
             if (debugTrajectoryPrediction)
-            Debug.DrawRay(simPos, Vector3.up * 2f, Color.green, 0.5f); // ✅ safe
-
+            {
+                Debug.DrawRay(simPos, Vector3.up * 2f, Color.green, 0.5f); // ✅ safe
+                Debug.DrawRay(simPos + Vector3.up * 0.2f, Vector3.up * 0.5f, Color.red, 1f); // unsafe point
+            }
         }
-
         return false;
     }
     private bool IsOnNavMesh(Vector3 position, float maxDistance = 1.0f)
@@ -868,10 +1017,11 @@ public class AICarController : MonoBehaviour
                     );
                 }
 
-               
+                float requiredClearance = Mathf.Max(carWidth * 0.5f + 0.3f, safeDistance);
+
 
                 // Clamp if too close
-                if (distToEdge < safeDistance)
+                if (distToEdge < requiredClearance)
                 {
                     return hit.position + directionAway * (safeDistance - distToEdge);
                 }
@@ -997,6 +1147,33 @@ public class AICarController : MonoBehaviour
                 (jokerWaypoints[jokerWaypointIndex].position - transform.position).normalized * 5f,
                 Color.magenta
             );
+        }
+
+        if (debugDrawBezierCurve)
+        {
+            List<Transform> path = isTakingJokerLap ? jokerWaypoints : waypoints;
+            int i = isTakingJokerLap ? jokerWaypointIndex : currentWaypointIndex;
+
+            if (i >= 1 && i <= path.Count - 3)
+            {
+                Vector3 p0 = path[i - 1].position;
+                Vector3 p1 = path[i].position;
+                Vector3 p2 = path[i + 1].position;
+                Vector3 p3 = path[i + 2].position;
+
+                int samples = 20;
+                Vector3 last = p1;
+
+                for (int j = 1; j <= samples; j++)
+                {
+                    float t = j / (float)samples;
+                    Vector3 pt = GetCatmullRomPosition(t, p0, p1, p2, p3);
+                    Vector3 clamped = GetNavMeshEdgeClamp(pt, 1.2f);
+
+                    Debug.DrawLine(last + Vector3.up * 0.1f, clamped + Vector3.up * 0.1f, Color.green);
+                    last = clamped;
+                }
+            }
         }
     }
 }

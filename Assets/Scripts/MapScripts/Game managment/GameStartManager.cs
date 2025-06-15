@@ -57,9 +57,11 @@ public class GameManager : MonoBehaviour
     public UnityEngine.UI.Text countdownText;
 
     [Header("Car Names")]
-    public List<string> possibleCarNames = new List<string> {
+    public List<string> possibleCarNames = new List<string>
+    {
         "ShadowFox", "WildViper", "BlazeRunner", "SteelStorm", "NightWolf",
-        "RallyKing", "DustHunter", "DriftQueen", "RedComet", "SkyBreaker"
+        "RallyKing", "DustHunter", "DriftQueen", "RedComet", "SkyBreaker",
+        "Takumi", "Danielius.Regesas", "Kanya West", "TUNG TUNG TUNG TUNG Sahur", "Razor",
     };
     private List<string> usedCarNames = new List<string>();
 

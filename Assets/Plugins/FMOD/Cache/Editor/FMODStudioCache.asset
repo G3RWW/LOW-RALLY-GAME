@@ -26,7 +26,7 @@ MonoBehaviour:
   Parameters:
   - {fileID: -5646303750766445953}
   MinDistance: 1
-  MaxDistance: 50
+  MaxDistance: 20
   Length: 0
 --- !u!114 &-8208396027742612981
 MonoBehaviour:
@@ -103,7 +103,7 @@ MonoBehaviour:
   Banks:
   - {fileID: 8640080790614153754}
   IsStream: 0
-  Is3D: 0
+  Is3D: 1
   IsOneShot: 0
   Parameters:
   - {fileID: 7319471845185775467}
@@ -347,7 +347,7 @@ MonoBehaviour:
   Banks:
   - {fileID: 8640080790614153754}
   IsStream: 1
-  Is3D: 0
+  Is3D: 1
   IsOneShot: 0
   Parameters:
   - {fileID: -4157249917234834963}
@@ -475,7 +475,7 @@ MonoBehaviour:
   - {fileID: -6291243791028858724}
   StringsBanks:
   - {fileID: -7152757348224058554}
-  cacheTime: 638853575433280992
+  cacheTime: 638856091185375082
   cacheVersion: 131624
 --- !u!114 &889991593548354274
 MonoBehaviour:
@@ -652,10 +652,10 @@ MonoBehaviour:
   Path: Assets/StreamingAssets/TEST/Build/Desktop/Engine.bank
   Name: Engine
   StudioPath: bank:/Engine
-  lastModified: 638853575433280992
+  lastModified: 638856091185375082
   FileSizes:
   - Name: Desktop
-    Value: 3287616
+    Value: 3288160
   Exists: 1
 --- !u!114 &8811783834283822968
 MonoBehaviour:

@@ -5,7 +5,7 @@
 			<value>VW_POLO_WRC_ENGINE</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{17f7b514-5129-4e86-ac5c-8b43b78a5d48}</destination>
@@ -478,6 +478,7 @@
 	<object class="MixerBusEffectChain" id="{113fc46e-17e3-471a-b130-c69324c53f9e}">
 		<relationship name="effects">
 			<destination>{78f1a05d-50df-4469-ba2f-5859dc5502f3}</destination>
+			<destination>{b9318393-60b7-41a7-aa8a-eccfeac25da5}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{4873c912-da86-4180-904f-a19b8a14cf4e}" />
@@ -920,6 +921,7 @@
 	</object>
 	<object class="MixerBusFader" id="{b7b47ce3-941c-46d5-acb2-78e4c0216bb8}" />
 	<object class="MixerBusFader" id="{78f1a05d-50df-4469-ba2f-5859dc5502f3}" />
+	<object class="SpatialiserEffect" id="{b9318393-60b7-41a7-aa8a-eccfeac25da5}" />
 	<object class="AutomationPoint" id="{db564b98-c05d-47ec-8cbf-f4699fd2a1ac}">
 		<property name="position">
 			<value>500</value>

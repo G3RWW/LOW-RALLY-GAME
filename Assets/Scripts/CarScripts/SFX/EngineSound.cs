@@ -1,6 +1,7 @@
 using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
+
 public class EngineSoundFMOD : MonoBehaviour
 {
     [Header("FMOD Settings")]
@@ -8,38 +9,40 @@ public class EngineSoundFMOD : MonoBehaviour
     public float minRPM = 800f;
     public float maxRPM = 7000f;
 
-    private Bus engineBus;
-
     [Header("Car Reference")]
     public CarController car;
+    public Rigidbody carRigidbody; // 👈 assign this manually in Inspector
 
     private EventInstance engineInstance;
     private bool instanceIsValid = false;
 
-    void Awake()
+    void Start()
     {
         if (car == null)
         {
-            car = GetComponent<CarController>();
+            Debug.LogError($"[EngineSoundFMOD] ❌ CarController not assigned on {gameObject.name}");
+            return;
         }
 
-        engineBus = RuntimeManager.GetBus("bus:/Engine");
+        if (carRigidbody == null)
+        {
+            Debug.LogError($"[EngineSoundFMOD] ❌ Rigidbody not assigned on {gameObject.name}. Refusing to continue to avoid FMOD auto-adding one.");
+            return;
+        }
+
+        if (engineEvent.IsNull)
+        {
+            Debug.LogError($"[EngineSoundFMOD] ❌ Engine Event not assigned on {gameObject.name}");
+            return;
+        }
+
+        // ✅ FMOD will NOT create Rigidbody here since carRigidbody is valid
+        engineInstance = RuntimeManager.CreateInstance(engineEvent);
+        RuntimeManager.AttachInstanceToGameObject(engineInstance, transform, carRigidbody);
+        engineInstance.start();
+        instanceIsValid = true;
     }
 
-    void Start()
-    {
-        if (!engineEvent.IsNull)
-        {
-            engineInstance = RuntimeManager.CreateInstance(engineEvent);
-            RuntimeManager.AttachInstanceToGameObject(engineInstance, car.transform, car._rigidbody);
-            engineInstance.start();
-            instanceIsValid = true;
-        }
-        else
-        {
-            Debug.LogError("[EngineSoundFMOD] Engine event not assigned!");
-        }
-    }
 
     void Update()
     {
@@ -48,17 +51,9 @@ public class EngineSoundFMOD : MonoBehaviour
         float clampedRPM = Mathf.Clamp(car.currentRPM, minRPM, maxRPM);
         engineInstance.setParameterByName("RPM", clampedRPM);
 
-        // 🔊 Set volume from global audio manager
         if (FMODAudioManager.Instance != null)
-        {
             engineInstance.setVolume(FMODAudioManager.Instance.engineVolume);
-        }
-
-        // 🔁 Update FMOD instance position (prevents falling below map)
-        RuntimeManager.AttachInstanceToGameObject(engineInstance, car.transform, car._rigidbody);
-
     }
-
 
     void OnDestroy()
     {

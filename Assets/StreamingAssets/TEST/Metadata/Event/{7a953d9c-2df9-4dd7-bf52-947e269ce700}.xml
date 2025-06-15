@@ -5,7 +5,7 @@
 			<value>911_GT3_FLAT_6_ENGINE</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{17f7b514-5129-4e86-ac5c-8b43b78a5d48}</destination>
@@ -644,6 +644,7 @@
 	<object class="MixerBusEffectChain" id="{060bc810-a2ea-4a5d-8bdb-075c0d6af421}">
 		<relationship name="effects">
 			<destination>{2a6cde40-2a5c-4fd1-817f-9715073a5344}</destination>
+			<destination>{2e442343-a3d0-4116-b69c-dbb09d65a7fa}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{7153a73c-a466-4d2d-ac3a-c34fc632dbce}" />
@@ -1218,6 +1219,7 @@
 	</object>
 	<object class="MixerBusFader" id="{c7aa0a1e-fc72-468e-a57a-3f4250381361}" />
 	<object class="MixerBusFader" id="{2a6cde40-2a5c-4fd1-817f-9715073a5344}" />
+	<object class="SpatialiserEffect" id="{2e442343-a3d0-4116-b69c-dbb09d65a7fa}" />
 	<object class="AutomationPoint" id="{937d59bb-ed37-4f13-bec8-75e82e3ec17d}">
 		<property name="position">
 			<value>1000</value>
