@@ -75,3 +75,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /Assets/Plugins/FMOD/Cache/Editor
 /Assets/Plugins/FMOD/Cache
+Assets/Plugins/FMOD/Cache/Editor/FMODStudioCache.asset
