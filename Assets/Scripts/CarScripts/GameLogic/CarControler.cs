@@ -534,7 +534,6 @@ public class CarController : MonoBehaviour
         wheelColliderFl.sidewaysFriction = frontFriction;
         wheelColliderFr.sidewaysFriction = frontFriction;
     }
-    
 //=============================================================================================
     // Handle steering input and apply dynamic steering limits
     public void HandleSteering(float steer)
