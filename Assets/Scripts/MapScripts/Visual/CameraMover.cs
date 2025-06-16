@@ -20,7 +20,7 @@ public class CameraMover : MonoBehaviour
     public CameraPoint basePoint; // Default on launch
     public CameraPoint[] points;
 
-    void Start()
+   void Start()
     {
         if (basePoint != null)
         {
